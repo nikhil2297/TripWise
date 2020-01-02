@@ -22,7 +22,6 @@ import com.google.android.material.chip.ChipGroup;
 import com.tripewise.R;
 import com.tripewise.utilites.storage.TripStorage;
 import com.tripewise.utilites.storage.data.TripData;
-import com.tripewise.utilites.storage.tasks.DatabaseAsyncConfig;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
@@ -155,9 +154,7 @@ public class AddTripsDialogFragment extends DialogFragment implements View.OnCli
 
                     try {
                         TripStorage.getDataBaseInstance(getActivity()).insertTripData(data);
-                    } catch (ExecutionException e) {
-                        e.printStackTrace();
-                    } catch (InterruptedException e) {
+                    } catch (ExecutionException | InterruptedException e) {
                         e.printStackTrace();
                     }
                     dismissAllowingStateLoss();
@@ -172,7 +169,7 @@ public class AddTripsDialogFragment extends DialogFragment implements View.OnCli
     private void setButtonState() {
         if (isMember && isTripName) {
             btSave.setEnabled(true);
-        }else {
+        } else {
             btSave.setEnabled(false);
         }
     }

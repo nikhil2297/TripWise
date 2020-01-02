@@ -2,43 +2,73 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:layout_height="100dp"
     android:background="@color/colorWhite"
     app:cardCornerRadius="20dp"
-    app:strokeWidth="0.5dp"
-    app:strokeColor="@color/colorBlack"
     app:cardElevation="0dp"
-    android:layout_height="100dp">
+    app:strokeColor="@color/colorBlack"
+    app:strokeWidth="0.5dp">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_height="match_parent"
-        android:layout_width="match_parent">
-
-    <TextView
-        android:id="@+id/tv_trip_name"
+    <com.zerobranch.layout.SwipeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="15dp"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginEnd="15dp"
-        android:layout_marginRight="15dp"
-        android:text="@string/trip_name"
-        android:textColor="@color/colorPrimaryDark"
-        android:textSize="30sp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="100dp"
+        app:draggedItem="@id/parent"
+        app:rightItem="@id/ll_delete"
+        app:swipeDirection="left">
 
-    <TextView
-        android:id="@+id/tv_trip_data"
-        android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="5dp"
-        android:textSize="22sp"
-        android:text="@string/trip_people"
-        android:gravity="center_vertical"
-        app:layout_constraintEnd_toEndOf="@id/tv_trip_name"
-        app:layout_constraintStart_toStartOf="@id/tv_trip_name"
-        app:layout_constraintTop_toBottomOf="@id/tv_trip_name" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_delete"
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:layout_gravity="end"
+            android:background="@color/colorRed">
+
+            <ImageView
+                android:id="@+id/iv_delete"
+                android:layout_width="35dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_delete_white" />
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/parent"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_vertical"
+            android:background="@color/colorWhite"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_trip_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="15dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="15dp"
+                android:layout_marginRight="15dp"
+                android:text="@string/trip_name"
+                android:textColor="@color/colorBlack"
+                android:textSize="30sp"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_trip_data"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginLeft="15dp"
+                android:layout_marginTop="5dp"
+                android:gravity="center_vertical"
+                android:text="@string/trip_people"
+                android:textSize="22sp"
+                app:layout_constraintEnd_toEndOf="@id/tv_trip_name"
+                app:layout_constraintStart_toStartOf="@id/tv_trip_name"
+                app:layout_constraintTop_toBottomOf="@id/tv_trip_name" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.zerobranch.layout.SwipeLayout>
 </com.google.android.material.card.MaterialCardView>

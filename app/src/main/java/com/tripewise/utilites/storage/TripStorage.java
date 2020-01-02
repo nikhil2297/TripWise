@@ -65,4 +65,56 @@ public abstract class TripStorage extends RoomDatabase {
             return INSTANCE.tripDao().addTrip(tripData);
         }
     }
+
+    public int updateBillCount(int billCount, int tripId) throws ExecutionException, InterruptedException {
+        int id = new UpdateTripBillCount(billCount, tripId).execute().get();
+
+        if (id > 0) {
+            Log.d("DatabaseConfigAsync : ", "Bill Count updated in database");
+            return id;
+        } else {
+            Log.d("DatabaseConfigAsync : ", "TripId not found");
+            return 0;
+        }
+    }
+
+    private static class UpdateTripBillCount extends AsyncTask<Void, Void, Integer> {
+        private int billCount;
+        private int id;
+
+        UpdateTripBillCount(int billCount, int id) {
+            this.billCount = billCount;
+            this.id = id;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... voids) {
+            return INSTANCE.tripDao().updateBillCount(billCount, id);
+        }
+    }
+
+    public int deleteTrip(int tripId) throws ExecutionException, InterruptedException {
+        int id = new DeleteTripEntry(tripId).execute().get();
+
+        if (id > 0) {
+            Log.d("DatabaseConfigAsync : ", "Trip deleted from database");
+            return id;
+        } else {
+            Log.d("DatabaseConfigAsync : ", "TripId not found");
+            return 0;
+        }
+    }
+
+    private static class DeleteTripEntry extends AsyncTask<Void, Void, Integer> {
+        private int id;
+
+        DeleteTripEntry(int id) {
+            this.id = id;
+        }
+
+        @Override
+        protected Integer doInBackground(Void... voids) {
+            return INSTANCE.tripDao().deleteTripEntry(id);
+        }
+    }
 }

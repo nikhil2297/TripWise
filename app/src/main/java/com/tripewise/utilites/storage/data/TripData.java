@@ -20,6 +20,9 @@ public class TripData {
     @ColumnInfo(name = "member_count")
     private int memberCount;
 
+    @ColumnInfo(name = "bill_count")
+    private int billCount;
+
     public int getId() {
         return id;
     }
@@ -50,5 +53,13 @@ public class TripData {
 
     public void setMemberCount(int memberCount) {
         this.memberCount = memberCount;
+    }
+
+    public int getBillCount() {
+        return billCount;
+    }
+
+    public void setBillCount(int billCount) {
+        this.billCount = billCount;
     }
 }

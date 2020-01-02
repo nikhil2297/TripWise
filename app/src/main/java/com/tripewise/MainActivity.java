@@ -1,13 +1,17 @@
 package com.tripewise;
 
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
-import android.widget.ListView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.tripewise.trips.AddTripsDialogFragment;
@@ -17,15 +21,17 @@ import com.tripewise.utilites.storage.data.TripData;
 
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, TripsAdapter.ItemClickListener {
 
     private FloatingActionButton addTrip;
 
-    private ListView lvTrips;
+    private RecyclerView lvTrips;
 
     private List<TripData> tripDataList;
 
     private TripsAdapter adapter;
+
+    private TextView tvHelpText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,10 +40,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         addTrip = findViewById(R.id.fab_add_trips);
         addTrip.setOnClickListener(this);
 
-        TextView tvHelpText = findViewById(R.id.tv_help_message);
+        tvHelpText = findViewById(R.id.tv_help_message);
 
         lvTrips = findViewById(R.id.lv_trip);
-        lvTrips.setEmptyView(tvHelpText);
+
+        LinearLayoutManager manager = new LinearLayoutManager(this);
+        lvTrips.setLayoutManager(manager);
+
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(lvTrips.getContext(), DividerItemDecoration.VERTICAL);
+        itemDecoration.setDrawable(getResources().getDrawable(R.drawable.recycler_view_divider));
+
+        lvTrips.addItemDecoration(itemDecoration);
 
         getTripData();
     }
@@ -65,8 +78,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     tripDataList = tripData;
                     adapter = new TripsAdapter(MainActivity.this, tripDataList);
                     lvTrips.setAdapter(adapter);
+
+                    adapter.setOnItemClickListener(MainActivity.this);
+                }
+
+                if (tripData.size() > 0) {
+                    tvHelpText.setVisibility(View.GONE);
+                } else {
+                    tvHelpText.setVisibility(View.VISIBLE);
                 }
             }
         });
+    }
+
+    @Override
+    public void onClick(int tripId) {
+
     }
 }

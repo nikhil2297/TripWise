@@ -5,7 +5,7 @@ android {
     buildToolsVersion "29.0.2"
     defaultConfig {
         applicationId "com.tripewise"
-        minSdkVersion 15
+        minSdkVersion 19
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
@@ -30,6 +30,8 @@ dependencies {
 
     implementation "androidx.room:room-runtime:2.2.3"
     annotationProcessor "androidx.room:room-compiler:2.2.3"
+
+    implementation 'com.github.zerobranch:SwipeLayout:1.3.0'
 
     implementation 'com.google.code.gson:gson:2.8.6'
 }

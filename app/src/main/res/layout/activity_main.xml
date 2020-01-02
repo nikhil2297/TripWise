@@ -7,13 +7,11 @@
     android:background="#FEFEFA"
     tools:context=".MainActivity">
 
-    <ListView
+    <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/lv_trip"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="10dp"
-        android:dividerHeight="5dp"
-        android:divider="@color/colorTransparent" />
+        android:padding="10dp" />
 
     <TextView
         android:id="@+id/tv_help_message"

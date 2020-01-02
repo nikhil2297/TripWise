@@ -18,7 +18,7 @@
             android:background="@color/colorTransparent"
             android:gravity="center"
             android:hint="@string/text_trip_name"
-            android:inputType="text"
+            android:inputType="textCapWords"
             android:textColor="@color/colorBlack"
             android:textSize="24sp"
             app:layout_constraintBottom_toTopOf="@+id/ll_members"
@@ -56,7 +56,7 @@
                 android:background="@null"
                 android:gravity="center"
                 android:hint="@string/text_memeber_name"
-                android:inputType="text"
+                android:inputType="textCapSentences"
                 android:textColor="@color/colorBlack"
                 android:textSize="24sp" />
 
