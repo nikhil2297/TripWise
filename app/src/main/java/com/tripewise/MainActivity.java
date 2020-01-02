@@ -7,6 +7,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -32,6 +34,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private TripsAdapter adapter;
 
     private TextView tvHelpText;
+
+    private Fragment currentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,7 +96,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
-    public void onClick(int tripId) {
+    public void onClick(TripData tripData) {
 
+    }
+
+    private void showFragment(Fragment fragment){
+        FragmentManager manager = getSupportFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        transaction.replace(R.id.container, fragment);
+
+        transaction.addToBackStack(fragment.getClass().getName());
+
+        currentFragment = fragment;
     }
 }

@@ -58,7 +58,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ItemHolder> 
         holder.mainLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                listener.onClick(tripData.get(i).getId());
+                listener.onClick(tripData.get(i));
             }
         });
     }
@@ -93,6 +93,6 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ItemHolder> 
     }
 
     public interface ItemClickListener {
-        void onClick(int tripId);
+        void onClick(TripData tripData);
     }
 }
