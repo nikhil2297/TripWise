@@ -38,7 +38,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ItemHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull final TripsAdapter.ItemHolder holder, final int i) {
-        holder.tvTripData.setText(context.getResources().getString(R.string.trip_people, tripData.get(i).getMemberCount(), 0));
+        holder.tvTripData.setText(context.getResources().getString(R.string.trip_people, tripData.get(i).getMemberCount(), tripData.get(i).getBillCount()));
         holder.tvTripName.setText(tripData.get(i).getTripName());
 
         holder.ivDelete.setOnClickListener(new View.OnClickListener() {

@@ -26,12 +26,10 @@ import com.tripewise.utilites.storage.data.TripData;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-public class AddTripsDialogFragment extends DialogFragment implements View.OnClickListener {
+public class TripsDialogFragment extends DialogFragment implements View.OnClickListener {
 
     private EditText etTripName;
     private EditText etMemberName;
-
-    private TextView tvAddMember;
 
     private ChipGroup chipGroupMember;
 

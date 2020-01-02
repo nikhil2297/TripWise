@@ -1,11 +1,9 @@
 package com.tripewise;
 
 import android.os.Bundle;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -16,7 +14,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.tripewise.trips.AddTripsDialogFragment;
+import com.tripewise.bills.BillsFragment;
+import com.tripewise.trips.TripsDialogFragment;
 import com.tripewise.trips.TripsAdapter;
 import com.tripewise.utilites.storage.TripStorage;
 import com.tripewise.utilites.storage.data.TripData;
@@ -62,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        AddTripsDialogFragment tripsDialogFragment = new AddTripsDialogFragment();
+        TripsDialogFragment tripsDialogFragment = new TripsDialogFragment();
         tripsDialogFragment.show(fragmentTransaction, "adding");
     }
 
@@ -97,7 +96,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(TripData tripData) {
-
+        BillsFragment billsFragment = BillsFragment.newInstance(tripData);
+        showFragment(billsFragment);
     }
 
     private void showFragment(Fragment fragment){
