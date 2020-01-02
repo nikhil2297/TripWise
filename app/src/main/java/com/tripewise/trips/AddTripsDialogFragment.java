@@ -1,12 +1,9 @@
 package com.tripewise.trips;
 
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
-import android.text.Spanned;
 import android.text.TextWatcher;
-import android.text.style.ImageSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -14,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -22,12 +18,14 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.google.android.material.chip.Chip;
-import com.google.android.material.chip.ChipDrawable;
 import com.google.android.material.chip.ChipGroup;
 import com.tripewise.R;
+import com.tripewise.utilites.storage.TripStorage;
+import com.tripewise.utilites.storage.data.TripData;
+import com.tripewise.utilites.storage.tasks.DatabaseAsyncConfig;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class AddTripsDialogFragment extends DialogFragment implements View.OnClickListener {
 
@@ -38,9 +36,13 @@ public class AddTripsDialogFragment extends DialogFragment implements View.OnCli
 
     private ChipGroup chipGroupMember;
 
-    private List<String> memberName;
+    private ArrayList<String> memberName;
 
-    private boolean createChip;
+    private Button btSave;
+    private Button btCancel;
+
+    private boolean isMember;
+    private boolean isTripName;
 
     @Nullable
     @Override
@@ -61,11 +63,25 @@ public class AddTripsDialogFragment extends DialogFragment implements View.OnCli
 
         chipGroupMember = view.findViewById(R.id.chip_member_group);
 
-        Button btSave = view.findViewById(R.id.bt_save);
-        Button btCancel = view.findViewById(R.id.bt_cancel);
+        btSave = view.findViewById(R.id.bt_save);
+        btCancel = view.findViewById(R.id.bt_cancel);
 
         btSave.setOnClickListener(this);
         btCancel.setOnClickListener(this);
+
+        chipGroupMember.setOnHierarchyChangeListener(new ViewGroup.OnHierarchyChangeListener() {
+            @Override
+            public void onChildViewAdded(View view, View view1) {
+                isMember = chipGroupMember.getChildCount() >= 2;
+                setButtonState();
+            }
+
+            @Override
+            public void onChildViewRemoved(View view, View view1) {
+                isMember = chipGroupMember.getChildCount() >= 2;
+                setButtonState();
+            }
+        });
 
         etMemberName.setOnKeyListener(new View.OnKeyListener() {
             @Override
@@ -80,6 +96,24 @@ public class AddTripsDialogFragment extends DialogFragment implements View.OnCli
                     }
                 }
                 return false;
+            }
+        });
+
+        etTripName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                isTripName = charSequence.length() > 0;
+                setButtonState();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
             }
         });
     }
@@ -113,10 +147,33 @@ public class AddTripsDialogFragment extends DialogFragment implements View.OnCli
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.bt_save:
+                if (isMember && isTripName) {
+                    TripData data = new TripData();
+                    data.setTripName(etTripName.getText().toString());
+                    data.setMemberName(memberName);
+                    data.setMemberCount(memberName.size());
+
+                    try {
+                        TripStorage.getDataBaseInstance(getActivity()).insertTripData(data);
+                    } catch (ExecutionException e) {
+                        e.printStackTrace();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    dismissAllowingStateLoss();
+                }
                 break;
             case R.id.bt_cancel:
                 dismissAllowingStateLoss();
                 break;
+        }
+    }
+
+    private void setButtonState() {
+        if (isMember && isTripName) {
+            btSave.setEnabled(true);
+        }else {
+            btSave.setEnabled(false);
         }
     }
 }

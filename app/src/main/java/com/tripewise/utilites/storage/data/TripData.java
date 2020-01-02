@@ -4,18 +4,18 @@ import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 
-import java.util.List;
+import java.util.ArrayList;
 
 @Entity
 public class TripData {
-    @PrimaryKey
+    @PrimaryKey(autoGenerate = true)
     private int id;
 
     @ColumnInfo(name = "trip_name")
     private String tripName;
 
     @ColumnInfo(name = "member_name")
-    private List<String> memberName;
+    private ArrayList<String> memberName;
 
     @ColumnInfo(name = "member_count")
     private int memberCount;
@@ -36,11 +36,11 @@ public class TripData {
         this.tripName = tripName;
     }
 
-    public List<String> getMemberName() {
+    public ArrayList<String> getMemberName() {
         return memberName;
     }
 
-    public void setMemberName(List<String> memberName) {
+    public void setMemberName(ArrayList<String> memberName) {
         this.memberName = memberName;
     }
 
