@@ -22,11 +22,12 @@ import com.google.android.material.chip.ChipGroup;
 import com.tripewise.R;
 import com.tripewise.utilites.storage.TripStorage;
 import com.tripewise.utilites.storage.data.TripData;
+import com.tripewise.utilites.storage.tasks.TripAsyncConfig;
 
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 
-public class TripsDialogFragment extends DialogFragment implements View.OnClickListener {
+public class TripDialogFragment extends DialogFragment implements View.OnClickListener {
 
     private EditText etTripName;
     private EditText etMemberName;
@@ -41,6 +42,8 @@ public class TripsDialogFragment extends DialogFragment implements View.OnClickL
     private boolean isMember;
     private boolean isTripName;
 
+    private TripAsyncConfig asyncConfig;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -50,6 +53,7 @@ public class TripsDialogFragment extends DialogFragment implements View.OnClickL
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        asyncConfig = new TripAsyncConfig(getActivity());
 
         memberName = new ArrayList<>();
 
@@ -151,7 +155,7 @@ public class TripsDialogFragment extends DialogFragment implements View.OnClickL
                     data.setMemberCount(memberName.size());
 
                     try {
-                        TripStorage.getDataBaseInstance(getActivity()).insertTripData(data);
+                        asyncConfig.insertTripData(data);
                     } catch (ExecutionException | InterruptedException e) {
                         e.printStackTrace();
                     }

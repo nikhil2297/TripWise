@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_nav_board"
+    app:startDestination="@id/tripFragment">
+
+    <fragment
+        android:id="@+id/tripFragment"
+        android:name="com.tripewise.trips.TripFragment"
+        android:label="fragment_trip"
+        tools:layout="@layout/fragment_trip" >
+        <action
+            android:id="@+id/action_tripFragment_to_billsFragment"
+            app:destination="@id/billsFragment"
+            app:popUpTo="@+id/tripFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/billsFragment"
+        android:name="com.tripewise.bills.BillsFragment"
+        android:label="fragment_bills"
+        tools:layout="@layout/fragment_bills" >
+        <argument
+            android:name="trip_data"
+            app:argType="string"/>
+    </fragment>
+</navigation>

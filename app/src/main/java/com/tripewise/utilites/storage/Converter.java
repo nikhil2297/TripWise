@@ -50,28 +50,4 @@ public class Converter {
         List<BillData.BillPeople> billPeopleList = gson.fromJson(billPeople, type);
         return billPeopleList;
     }
-
-    @TypeConverter
-    public String formPeopleList(List<PersonData.PeopleData> peopleList) {
-        if (peopleList == null) {
-            return null;
-        }
-        Gson gson = new Gson();
-        Type type = new TypeToken<List<BillData.BillPeople>>() {
-        }.getType();
-        String json = gson.toJson(peopleList, type);
-        return json;
-    }
-
-    @TypeConverter
-    public List<PersonData.PeopleData> toPeopleList(String peopleList) {
-        if (peopleList == null) {
-            return null;
-        }
-        Gson gson = new Gson();
-        Type type = new TypeToken<List<PersonData.PeopleData>>() {
-        }.getType();
-        List<PersonData.PeopleData> billPeopleList = gson.fromJson(peopleList, type);
-        return billPeopleList;
-    }
 }

@@ -3,7 +3,6 @@ package com.tripewise.utilites.storage.data;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;
-import androidx.room.TypeConverter;
 import androidx.room.TypeConverters;
 
 import com.tripewise.utilites.storage.Converter;
@@ -34,15 +33,15 @@ public class BillData {
     @ColumnInfo(name = "bill_people")
     private ArrayList<BillPeople> billPeopleList;
 
-    public class BillPeople{
-       @ColumnInfo(name = "bill_people_name")
-       private String peopleName;
+    @ColumnInfo(name = "bill_paid_people")
+    private ArrayList<BillPeople> billPaidPeopleList;
 
-       @ColumnInfo(name = "bill_people_amount")
-       private int amount;
+    public class BillPeople {
+        @ColumnInfo(name = "bill_people_name")
+        private String peopleName;
 
-       @ColumnInfo(name = "bill_people_amount_type")
-       private int amountType;
+        @ColumnInfo(name = "bill_people_amount")
+        private long amount;
 
         public String getPeopleName() {
             return peopleName;
@@ -52,20 +51,12 @@ public class BillData {
             this.peopleName = peopleName;
         }
 
-        public int getAmount() {
+        public long getAmount() {
             return amount;
         }
 
-        public void setAmount(int amount) {
+        public void setAmount(long amount) {
             this.amount = amount;
-        }
-
-        public int getAmountType() {
-            return amountType;
-        }
-
-        public void setAmountType(int amountType) {
-            this.amountType = amountType;
         }
     }
 
@@ -124,5 +115,14 @@ public class BillData {
 
     public void setBillPeopleList(ArrayList<BillPeople> billPeopleList) {
         this.billPeopleList = billPeopleList;
+    }
+
+    @TypeConverters({Converter.class})
+    public ArrayList<BillPeople> getBillPaidPeopleList() {
+        return billPaidPeopleList;
+    }
+
+    public void setBillPaidPeopleList(ArrayList<BillPeople> billPaidPeopleList) {
+        this.billPaidPeopleList = billPaidPeopleList;
     }
 }

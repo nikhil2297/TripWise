@@ -4,17 +4,19 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+import com.google.gson.internal.Primitives;
 import com.tripewise.R;
 import com.tripewise.utilites.storage.data.TripData;
 
@@ -23,10 +25,12 @@ public class BillsFragment extends Fragment {
 
     private RecyclerView rvBills;
 
-    public static BillsFragment newInstance(TripData tripData) {
-        BillsFragment fragment = new BillsFragment();
-        fragment.tripData = tripData;
-        return fragment;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        BillsFragmentArgs args = BillsFragmentArgs.fromBundle(getArguments());
+
+        tripData = new Gson().fromJson(args.getTripData(), TripData.class);
     }
 
     @Nullable
@@ -58,7 +62,10 @@ public class BillsFragment extends Fragment {
         btAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
 
+                AddBillFragment billFragment = new AddBillFragment();
+                billFragment.show(transaction, "bill_adding");
             }
         });
     }

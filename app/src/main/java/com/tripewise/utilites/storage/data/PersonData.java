@@ -2,20 +2,25 @@ package com.tripewise.utilites.storage.data;
 
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
-import androidx.room.TypeConverters;
+import androidx.room.PrimaryKey;
 
-import com.tripewise.utilites.storage.Converter;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 public class PersonData {
+    @PrimaryKey(autoGenerate = true)
+    private int id;
+
     @ColumnInfo(name = "person_name")
     private String personName;
 
     @ColumnInfo(name = "total_amount_paid")
     private int totalAmountPaid;
+
+    @ColumnInfo(name = "trip_id")
+    private int tripId;
 
     @ColumnInfo(name = "bill_id")
     private ArrayList<Integer> billIds;
@@ -26,34 +31,15 @@ public class PersonData {
     @ColumnInfo(name = "paying_amount")
     private int payingAmount;
 
-    @ColumnInfo(name = "paying_people")
-    private List<PeopleData> payingPeople;
+    @ColumnInfo(name = "paying_details")
+    private String paymentDetails;
 
-    @ColumnInfo(name = "receiving_people")
-    private List<PeopleData> receivingPeople;
+    public int getId() {
+        return id;
+    }
 
-    public class PeopleData{
-        @ColumnInfo(name = "people_data_name")
-        private String peopleName;
-
-        @ColumnInfo(name = "people_data_amount")
-        private int amount;
-
-        public String getPeopleName() {
-            return peopleName;
-        }
-
-        public void setPeopleName(String peopleName) {
-            this.peopleName = peopleName;
-        }
-
-        public int getAmount() {
-            return amount;
-        }
-
-        public void setAmount(int amount) {
-            this.amount = amount;
-        }
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getPersonName() {
@@ -96,21 +82,23 @@ public class PersonData {
         this.payingAmount = payingAmount;
     }
 
-    @TypeConverters({Converter.class})
-    public List<PeopleData> getPayingPeople() {
-        return payingPeople;
+    public int getTripId() {
+        return tripId;
     }
 
-    public void setPayingPeople(List<PeopleData> payingPeople) {
-        this.payingPeople = payingPeople;
+    public void setTripId(int tripId) {
+        this.tripId = tripId;
     }
 
-    @TypeConverters({Converter.class})
-    public List<PeopleData> getReceivingPeople() {
-        return receivingPeople;
+    public String getPaymentDetails() {
+        return paymentDetails;
     }
 
-    public void setReceivingPeople(List<PeopleData> receivingPeople) {
-        this.receivingPeople = receivingPeople;
+    public void setPaymentDetails(String paymentDetails) {
+        this.paymentDetails = paymentDetails;
+    }
+
+    public PaymentDetailsData getPaymentData() {
+        return new Gson().fromJson(paymentDetails, PaymentDetailsData.class);
     }
 }

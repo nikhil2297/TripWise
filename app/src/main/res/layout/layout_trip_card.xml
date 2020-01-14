@@ -3,6 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="100dp"
+    android:id="@+id/trip_card"
     android:background="@color/colorWhite"
     app:cardCornerRadius="20dp"
     app:cardElevation="0dp"
@@ -10,6 +11,7 @@
     app:strokeWidth="0.5dp">
 
     <com.zerobranch.layout.SwipeLayout
+        android:id="@+id/trip_swipe_layout"
         android:layout_width="match_parent"
         android:layout_height="100dp"
         app:draggedItem="@id/parent"

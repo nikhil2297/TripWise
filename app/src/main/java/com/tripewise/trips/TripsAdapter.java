@@ -11,9 +11,11 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.card.MaterialCardView;
 import com.tripewise.R;
-import com.tripewise.utilites.storage.TripStorage;
 import com.tripewise.utilites.storage.data.TripData;
+import com.tripewise.utilites.storage.tasks.TripAsyncConfig;
+import com.zerobranch.layout.SwipeLayout;
 
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -45,8 +47,10 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ItemHolder> 
             @Override
             public void onClick(View view) {
                 try {
-                    TripStorage.getDataBaseInstance(context).deleteTrip(tripData.get(i).getId());
+                    new TripAsyncConfig(context).deleteTrip(tripData.get(i).getId());
+
                     tripData.remove(i);
+
                     notifyItemRemoved(i);
                     holder.itemView.setVisibility(View.GONE);
                 } catch (ExecutionException | InterruptedException e) {
@@ -55,7 +59,7 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ItemHolder> 
             }
         });
 
-        holder.mainLayout.setOnClickListener(new View.OnClickListener() {
+        holder.tripDetailsLayout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 listener.onClick(tripData.get(i));
@@ -74,7 +78,11 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ItemHolder> 
 
         ImageView ivDelete;
 
-        ConstraintLayout mainLayout;
+        MaterialCardView mainLayout;
+
+        SwipeLayout tripSwipeLayout;
+
+        ConstraintLayout tripDetailsLayout;
 
         ItemHolder(@NonNull View view) {
             super(view);
@@ -84,7 +92,11 @@ public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ItemHolder> 
 
             ivDelete = view.findViewById(R.id.iv_delete);
 
-            mainLayout = view.findViewById(R.id.parent);
+            mainLayout = view.findViewById(R.id.trip_card);
+
+            tripSwipeLayout = mainLayout.findViewById(R.id.trip_swipe_layout);
+
+            tripDetailsLayout = tripSwipeLayout.findViewById(R.id.parent);
         }
     }
 
