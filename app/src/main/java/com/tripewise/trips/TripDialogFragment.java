@@ -11,7 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -20,11 +19,14 @@ import androidx.fragment.app.DialogFragment;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.tripewise.R;
-import com.tripewise.utilites.storage.TripStorage;
+import com.tripewise.utilites.storage.data.PaymentDetailsData;
+import com.tripewise.utilites.storage.data.PersonData;
 import com.tripewise.utilites.storage.data.TripData;
+import com.tripewise.utilites.storage.tasks.PeopleAsyncConfig;
 import com.tripewise.utilites.storage.tasks.TripAsyncConfig;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class TripDialogFragment extends DialogFragment implements View.OnClickListener {
@@ -35,6 +37,8 @@ public class TripDialogFragment extends DialogFragment implements View.OnClickLi
     private ChipGroup chipGroupMember;
 
     private ArrayList<String> memberName;
+
+    private List<PersonData> personData;
 
     private Button btSave;
     private Button btCancel;
@@ -56,6 +60,8 @@ public class TripDialogFragment extends DialogFragment implements View.OnClickLi
         asyncConfig = new TripAsyncConfig(getActivity());
 
         memberName = new ArrayList<>();
+
+        personData = new ArrayList<>();
 
         setCancelable(false);
 
@@ -159,6 +165,8 @@ public class TripDialogFragment extends DialogFragment implements View.OnClickLi
                     } catch (ExecutionException | InterruptedException e) {
                         e.printStackTrace();
                     }
+
+                    updatePeopleData();
                     dismissAllowingStateLoss();
                 }
                 break;
@@ -174,5 +182,42 @@ public class TripDialogFragment extends DialogFragment implements View.OnClickLi
         } else {
             btSave.setEnabled(false);
         }
+    }
+
+    private void updatePeopleData() {
+        ArrayList<PaymentDetailsData.Details> details = new ArrayList<>();
+
+        for (String s : memberName) {
+            createPeopleData(s);
+        }
+            PaymentDetailsData details1 = personData.get(0).getPaymentData();
+        try {
+            new PeopleAsyncConfig(getActivity(), null).insertPersonDetails(personData);
+        } catch (ExecutionException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createPeopleData(String name) {
+        PaymentDetailsData detailsData = new PaymentDetailsData();
+
+        PersonData data = new PersonData();
+        data.setPersonName(name);
+        data.setTripId(1);
+
+        for (String s : memberName) {
+            if (!s.equals(name)) {
+                PaymentDetailsData.Details details = new PaymentDetailsData.Details();
+
+                details.setName(s);
+
+                detailsData.setReceiveData(details);
+                detailsData.setSendData(details);
+
+                data.setPaymentData(detailsData);
+            }
+        }
+
+        personData.add(data);
     }
 }

@@ -20,5 +20,5 @@ public interface PersonDao {
     int updatePersonData(PersonData data);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    int insertPersondata(PersonData data);
+    long insertPersondata(PersonData data);
 }

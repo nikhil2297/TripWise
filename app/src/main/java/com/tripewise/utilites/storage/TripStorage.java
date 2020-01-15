@@ -14,11 +14,13 @@ import androidx.sqlite.db.SupportSQLiteDatabase;
 import com.tripewise.utilites.storage.dao.BillDao;
 import com.tripewise.utilites.storage.dao.PersonDao;
 import com.tripewise.utilites.storage.dao.TripDao;
+import com.tripewise.utilites.storage.data.BillData;
+import com.tripewise.utilites.storage.data.PersonData;
 import com.tripewise.utilites.storage.data.TripData;
 
 import java.util.concurrent.ExecutionException;
 
-@Database(entities = {TripData.class}, version = 1, exportSchema = false)
+@Database(entities = {TripData.class, PersonData.class, BillData.class}, version = 1, exportSchema = false)
 @TypeConverters({Converter.class})
 public abstract class TripStorage extends RoomDatabase {
 

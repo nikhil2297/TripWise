@@ -28,26 +28,27 @@ public class Converter {
     }
 
     @TypeConverter
-    public String formBillPeopleList(List<BillData.BillPeople> billPeople) {
+    public String formBillPeopleList(ArrayList<BillData.BillPeople> billPeople) {
         if (billPeople == null) {
             return null;
         }
         Gson gson = new Gson();
-        Type type = new TypeToken<List<BillData.BillPeople>>() {
+        Type type = new TypeToken<ArrayList<BillData.BillPeople>>() {
         }.getType();
         String json = gson.toJson(billPeople, type);
         return json;
     }
 
     @TypeConverter
-    public List<BillData.BillPeople> toBillPeopleList(String billPeople) {
+    public ArrayList<BillData.BillPeople> toBillPeopleList(String billPeople) {
         if (billPeople == null) {
             return null;
         }
         Gson gson = new Gson();
-        Type type = new TypeToken<List<BillData.BillPeople>>() {
+        Type type = new TypeToken<ArrayList<BillData.BillPeople>>() {
         }.getType();
-        List<BillData.BillPeople> billPeopleList = gson.fromJson(billPeople, type);
+        ArrayList<BillData.BillPeople> billPeopleList = gson.fromJson(billPeople, type);
+
         return billPeopleList;
     }
 }

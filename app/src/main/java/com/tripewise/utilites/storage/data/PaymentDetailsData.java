@@ -14,7 +14,7 @@ public class PaymentDetailsData {
     @SerializedName("send_details")
     private ArrayList<Details> sendDetails;
 
-    public class Details {
+    public static class Details {
         @SerializedName("name")
         private String name;
 
@@ -60,5 +60,38 @@ public class PaymentDetailsData {
 
     public void setSendDetails(ArrayList<Details> sendDetails) {
         this.sendDetails = sendDetails;
+    }
+
+    public void setPaidData(Details data) {
+        if (getPaidDetails() == null) {
+            ArrayList<Details> details = new ArrayList<>();
+            details.add(data);
+
+            setPaidDetails(details);
+        } else {
+            getPaidDetails().add(data);
+        }
+    }
+
+    public void setReceiveData(Details data) {
+        if (getReceiveDetails() == null) {
+            ArrayList<Details> details = new ArrayList<>();
+            details.add(data);
+
+            setReceiveDetails(details);
+        } else {
+            getReceiveDetails().add(data);
+        }
+    }
+
+    public void setSendData(Details data) {
+        if (getSendDetails() == null) {
+            ArrayList<Details> details = new ArrayList<>();
+            details.add(data);
+
+            setSendDetails(details);
+        } else {
+            getSendDetails().add(data);
+        }
     }
 }

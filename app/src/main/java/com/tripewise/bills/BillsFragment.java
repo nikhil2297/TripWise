@@ -64,7 +64,7 @@ public class BillsFragment extends Fragment {
             public void onClick(View v) {
                 FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
 
-                AddBillFragment billFragment = new AddBillFragment();
+                AddBillFragment billFragment = new AddBillFragment(tripData);
                 billFragment.show(transaction, "bill_adding");
             }
         });

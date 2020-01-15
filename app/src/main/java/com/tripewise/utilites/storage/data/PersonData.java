@@ -17,19 +17,16 @@ public class PersonData {
     private String personName;
 
     @ColumnInfo(name = "total_amount_paid")
-    private int totalAmountPaid;
+    private long totalAmountPaid;
 
     @ColumnInfo(name = "trip_id")
     private int tripId;
 
-    @ColumnInfo(name = "bill_id")
-    private ArrayList<Integer> billIds;
-
     @ColumnInfo(name = "receiving_amount")
-    private int receivingAmount;
+    private long receivingAmount;
 
     @ColumnInfo(name = "paying_amount")
-    private int payingAmount;
+    private long payingAmount;
 
     @ColumnInfo(name = "paying_details")
     private String paymentDetails;
@@ -50,35 +47,27 @@ public class PersonData {
         this.personName = personName;
     }
 
-    public int getTotalAmountPaid() {
+    public long getTotalAmountPaid() {
         return totalAmountPaid;
     }
 
-    public void setTotalAmountPaid(int totalAmountPaid) {
+    public void setTotalAmountPaid(long totalAmountPaid) {
         this.totalAmountPaid = totalAmountPaid;
     }
 
-    public ArrayList<Integer> getBillIds() {
-        return billIds;
-    }
-
-    public void setBillIds(ArrayList<Integer> billIds) {
-        this.billIds = billIds;
-    }
-
-    public int getReceivingAmount() {
+    public long getReceivingAmount() {
         return receivingAmount;
     }
 
-    public void setReceivingAmount(int receivingAmount) {
+    public void setReceivingAmount(long receivingAmount) {
         this.receivingAmount = receivingAmount;
     }
 
-    public int getPayingAmount() {
+    public long getPayingAmount() {
         return payingAmount;
     }
 
-    public void setPayingAmount(int payingAmount) {
+    public void setPayingAmount(long payingAmount) {
         this.payingAmount = payingAmount;
     }
 
@@ -95,10 +84,15 @@ public class PersonData {
     }
 
     public void setPaymentDetails(String paymentDetails) {
+        PaymentDetailsData detailsData = new Gson().fromJson(paymentDetails, PaymentDetailsData.class);
         this.paymentDetails = paymentDetails;
     }
 
     public PaymentDetailsData getPaymentData() {
         return new Gson().fromJson(paymentDetails, PaymentDetailsData.class);
+    }
+
+    public void setPaymentData(PaymentDetailsData data){
+        setPaymentDetails(new Gson().toJson(data).toString());
     }
 }

@@ -36,7 +36,7 @@ public class BillData {
     @ColumnInfo(name = "bill_paid_people")
     private ArrayList<BillPeople> billPaidPeopleList;
 
-    public class BillPeople {
+    public static class BillPeople {
         @ColumnInfo(name = "bill_people_name")
         private String peopleName;
 
