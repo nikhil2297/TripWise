@@ -23,7 +23,7 @@ import java.util.concurrent.ExecutionException;
 public class AddBillFragment extends BottomSheetDialogFragment {
     private TripData tripData;
 
-    AddBillFragment(TripData tripData){
+    AddBillFragment(TripData tripData) {
         this.tripData = tripData;
     }
 
@@ -52,6 +52,7 @@ public class AddBillFragment extends BottomSheetDialogFragment {
         });
     }
 
+    //TODO : Remove all the static data
     private BillData createBillData() {
         BillData data = new BillData();
         data.setBillName("Morning Lunch");

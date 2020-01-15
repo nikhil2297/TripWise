@@ -190,6 +190,7 @@ public class TripDialogFragment extends DialogFragment implements View.OnClickLi
         for (String s : memberName) {
             createPeopleData(s);
         }
+            //TODO : remove this line
             PaymentDetailsData details1 = personData.get(0).getPaymentData();
         try {
             new PeopleAsyncConfig(getActivity(), null).insertPersonDetails(personData);
@@ -198,6 +199,7 @@ public class TripDialogFragment extends DialogFragment implements View.OnClickLi
         }
     }
 
+    //TODO : remove the static data
     private void createPeopleData(String name) {
         PaymentDetailsData detailsData = new PaymentDetailsData();
 

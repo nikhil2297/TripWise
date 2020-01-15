@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+//TODO : We have to move all the calculation to different class
 public class PeopleAsyncConfig {
     private static TripStorage storage;
 
@@ -81,8 +82,6 @@ public class PeopleAsyncConfig {
             detailsData.setPaidData(details);
 
             data.setPaymentDetails(new Gson().toJson(detailsData).toString());
-
-        //    Log.d("PeopleAsyncConfig : ", "Sort Paid details = " + new Gson().toJson(data).toString());
         }
     }
 
@@ -110,8 +109,6 @@ public class PeopleAsyncConfig {
             paymentDetailsData.setReceiveDetails(detailsArrayList);
 
             data.setPaymentData(paymentDetailsData);
-
-        //    Log.d("PeopleAsyncConfig : ", "Sort Receiving details = " + new Gson().toJson(data).toString());
         } else {
             sortSendDetails(data);
         }
@@ -144,8 +141,6 @@ public class PeopleAsyncConfig {
             paymentDetailsData.setSendDetails(detailsArrayList);
 
             data.setPaymentData(paymentDetailsData);
-
-          //  Log.d("PeopleAsyncConfig : ", new Gson().toJson(data).toString());
         }
     }
 

@@ -20,6 +20,7 @@ import com.google.gson.internal.Primitives;
 import com.tripewise.R;
 import com.tripewise.utilites.storage.data.TripData;
 
+//TODO : set adapter fetch data from local db via live data
 public class BillsFragment extends Fragment {
     private TripData tripData;
 
