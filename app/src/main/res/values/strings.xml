@@ -15,4 +15,6 @@
     <string name="bill_help_message_1">Select Names</string>
     <string name="bill_help_message_2">People to be included :</string>
     <string name="bill_help_message_3">If none of the people are selected by default all members will be include</string>
+
+    <string name="amount">₹%1$d</string>
 </resources>

@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Util {
+    private static final String datePattern = "dd MMM yyyy";
 
     public static long dateToMilli(String dateString) {
         long time = 0;
@@ -26,5 +27,16 @@ public class Util {
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy HH:mm");
 
         return dateFormat.format(new Date(time));
+    }
+
+    public static boolean validateFormat(String input){
+        SimpleDateFormat format = new SimpleDateFormat(datePattern);
+        try {
+            format.parse(input);
+            return true;
+        }
+        catch(ParseException e){
+            return false;
+        }
     }
 }

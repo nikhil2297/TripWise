@@ -10,6 +10,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -43,6 +45,7 @@ public class BillsFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        final NavController controller = NavHostFragment.findNavController(this);
 
         rvBills = view.findViewById(R.id.rv_bills);
 
@@ -63,10 +66,7 @@ public class BillsFragment extends Fragment {
         btAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-
-                AddBillFragment billFragment = new AddBillFragment(tripData);
-                billFragment.show(transaction, "bill_adding");
+                controller.navigate(R.id.action_billsFragment_to_addBillFragment);
             }
         });
     }

@@ -21,6 +21,9 @@ public class PaymentDetailsData {
         @SerializedName("amount")
         private long amount;
 
+        @SerializedName("bill_name")
+        private String billName;
+
         public String getName() {
             return name;
         }
@@ -35,6 +38,14 @@ public class PaymentDetailsData {
 
         public void setAmount(long amount) {
             this.amount = amount;
+        }
+
+        public String getBillName() {
+            return billName;
+        }
+
+        public void setBillName(String billName) {
+            this.billName = billName;
         }
     }
 

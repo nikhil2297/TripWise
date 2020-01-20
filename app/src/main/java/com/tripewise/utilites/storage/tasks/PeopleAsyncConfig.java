@@ -21,13 +21,10 @@ public class PeopleAsyncConfig {
 
     private Context context;
 
-    private BillData billData;
-
     private List<PersonData> personDataList;
 
-    public PeopleAsyncConfig(Context context, BillData billData) {
+    public PeopleAsyncConfig(Context context) {
         this.context = context;
-        this.billData = billData;
 
         if (storage == null) {
             storage = TripStorage.getDataBaseInstance(context);
@@ -86,7 +83,7 @@ public class PeopleAsyncConfig {
         }
     }
 
-    public void updatePersonData() throws ExecutionException, InterruptedException {
+    public void updatePersonData(BillData billData) throws ExecutionException, InterruptedException {
         PersonUtils personUtils = new PersonUtils(billData, personDataList);
 
         for (PersonData personData : personUtils.initPersonData()) {

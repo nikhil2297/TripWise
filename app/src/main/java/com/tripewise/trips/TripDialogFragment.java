@@ -192,7 +192,7 @@ public class TripDialogFragment extends DialogFragment implements View.OnClickLi
         }
 
         try {
-            new PeopleAsyncConfig(getActivity(), null).insertPersonDetails(personData);
+            new PeopleAsyncConfig(getActivity()).insertPersonDetails(personData);
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         }

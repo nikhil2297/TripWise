@@ -1,13 +1,17 @@
 package com.tripewise.bills;
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.tripewise.R;
@@ -18,10 +22,31 @@ import com.tripewise.utilites.storage.tasks.BillAsyncConfig;
 import com.tripewise.utilites.storage.tasks.PeopleAsyncConfig;
 
 import java.util.ArrayList;
-import java.util.concurrent.ExecutionException;
 
-public class AddBillFragment extends BottomSheetDialogFragment {
+public class AddBillFragment extends Fragment implements View.OnClickListener {
     private TripData tripData;
+
+    private EditText etBillName;
+    private EditText etBillDate;
+    private EditText etBillTime;
+    private EditText etBillPaidPeople;
+    private EditText etBillPeople;
+    private EditText etBillAmount;
+
+    private Button btSave;
+    private Button btCancel;
+
+    private ArrayList<String> paidPeopleList;
+    private ArrayList<String> billPeopleList;
+
+    private PeopleAsyncConfig peopleAsyncConfig;
+
+    private BillAsyncConfig billAsyncConfig;
+
+    private boolean isBillName;
+    private boolean isBillDate;
+    private boolean isBillPaidPeople;
+    private boolean isBillAmount;
 
     AddBillFragment(TripData tripData) {
         this.tripData = tripData;
@@ -37,19 +62,106 @@ public class AddBillFragment extends BottomSheetDialogFragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        Button btSave = view.findViewById(R.id.bt_save);
-        btSave.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    new BillAsyncConfig(getActivity()).insertBillData(createBillData());
+        etBillName = view.findViewById(R.id.et_bill_name);
+        etBillAmount = view.findViewById(R.id.et_amount);
+        etBillDate = view.findViewById(R.id.et_date);
+        etBillTime = view.findViewById(R.id.et_time);
+        etBillPaidPeople = view.findViewById(R.id.et_paid_people);
+        etBillPeople = view.findViewById(R.id.et_people_list);
 
-                    new PeopleAsyncConfig(getActivity(), createBillData()).updatePersonData();
-                } catch (ExecutionException | InterruptedException e) {
-                    e.printStackTrace();
+        btSave = view.findViewById(R.id.bt_save);
+        btCancel = view.findViewById(R.id.bt_cancel);
+    }
+
+    private void init() {
+        billAsyncConfig = new BillAsyncConfig(getActivity());
+
+        peopleAsyncConfig = new PeopleAsyncConfig(getActivity());
+
+        billPeopleList = new ArrayList<>();
+        paidPeopleList = new ArrayList<>();
+
+        attachTextChangeListener(etBillName);
+        attachTextChangeListener(etBillDate);
+        attachTextChangeListener(etBillAmount);
+
+        etBillDate.setOnClickListener(this);
+        etBillTime.setOnClickListener(this);
+        etBillPeople.setOnClickListener(this);
+        etBillPaidPeople.setOnClickListener(this);
+    }
+
+    private void attachTextChangeListener(EditText editText) {
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                if (validation()) {
+                    btSave.setEnabled(true);
                 }
             }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
         });
+    }
+
+    private boolean validation() {
+        boolean isValid = false;
+        if (etBillName.getText().toString().length() > 1) {
+            isValid = true;
+        } else {
+            isValid = false;
+        }
+
+        if (Util.validateFormat(etBillDate.getText().toString())) {
+            isValid = true;
+        } else {
+            isValid = false;
+        }
+
+        if (etBillName.getText().toString().length() > 1) {
+            isValid = true;
+        } else {
+            isValid = false;
+        }
+
+        if (etBillName.getText().toString().length() > 1) {
+            isValid = true;
+        } else {
+            isValid = false;
+        }
+
+        if (etBillName.getText().toString().length() > 1) {
+            isValid = true;
+        } else {
+            isValid = false;
+        }
+        return isValid;
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.et_date:
+                break;
+            case R.id.et_time:
+                break;
+            case R.id.et_paid_people:
+                break;
+            case R.id.et_people_list:
+                break;
+            case R.id.bt_save:
+                break;
+            case R.id.bt_cancel:
+                break;
+        }
     }
 
     //TODO : Remove all the static data

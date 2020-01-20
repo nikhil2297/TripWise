@@ -23,5 +23,18 @@
         <argument
             android:name="trip_data"
             app:argType="string"/>
+        <action
+            android:id="@+id/action_billsFragment_to_addBillFragment"
+            app:destination="@id/addBillFragment"
+            app:popUpTo="@+id/billsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/addBillFragment"
+        android:name="com.tripewise.bills.AddBillFragment"
+        android:label="fragment_add_bill"
+        tools:layout="@layout/fragment_add_bill" >
+        <action
+            android:id="@+id/action_addBillFragment_to_billsFragment"
+            app:destination="@id/billsFragment" />
     </fragment>
 </navigation>

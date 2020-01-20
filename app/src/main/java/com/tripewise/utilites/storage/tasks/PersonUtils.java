@@ -46,8 +46,10 @@ public class PersonUtils {
             PaymentDetailsData detailsData = personData.getPaymentData();
 
             PaymentDetailsData.Details details = new PaymentDetailsData.Details();
+
             details.setName(billPeople.getPeopleName());
             details.setAmount(billPeople.getAmount());
+            details.setBillName(billData.getBillName());
 
             detailsData.setPaidData(details);
 
