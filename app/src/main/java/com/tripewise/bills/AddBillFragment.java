@@ -1,19 +1,25 @@
 package com.tripewise.bills;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.gson.Gson;
 import com.tripewise.R;
 import com.tripewise.utilites.Util;
 import com.tripewise.utilites.storage.data.BillData;
@@ -22,6 +28,7 @@ import com.tripewise.utilites.storage.tasks.BillAsyncConfig;
 import com.tripewise.utilites.storage.tasks.PeopleAsyncConfig;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 public class AddBillFragment extends Fragment implements View.OnClickListener {
     private TripData tripData;
@@ -36,8 +43,11 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     private Button btSave;
     private Button btCancel;
 
-    private ArrayList<String> paidPeopleList;
-    private ArrayList<String> billPeopleList;
+    private ArrayList<BillData.BillPeople> billPeopleList;
+    private ArrayList<BillData.BillPeople> paidPeopleList;
+
+    private ArrayList<BillData.BillPeople> finalBillPeopleList;
+    private ArrayList<BillData.BillPeople> finalPaidPeopleList;
 
     private PeopleAsyncConfig peopleAsyncConfig;
 
@@ -48,8 +58,12 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     private boolean isBillPaidPeople;
     private boolean isBillAmount;
 
-    AddBillFragment(TripData tripData) {
-        this.tripData = tripData;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        AddBillFragmentArgs args = AddBillFragmentArgs.fromBundle(getArguments());
+        tripData = new Gson().fromJson(args.getTripData(), TripData.class);
     }
 
     @Nullable
@@ -71,6 +85,8 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
 
         btSave = view.findViewById(R.id.bt_save);
         btCancel = view.findViewById(R.id.bt_cancel);
+
+        init();
     }
 
     private void init() {
@@ -78,8 +94,8 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
 
         peopleAsyncConfig = new PeopleAsyncConfig(getActivity());
 
-        billPeopleList = new ArrayList<>();
-        paidPeopleList = new ArrayList<>();
+        finalBillPeopleList = new ArrayList<>();
+        finalPaidPeopleList = new ArrayList<>();
 
         attachTextChangeListener(etBillName);
         attachTextChangeListener(etBillDate);
@@ -114,6 +130,7 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
 
     private boolean validation() {
         boolean isValid = false;
+
         if (etBillName.getText().toString().length() > 1) {
             isValid = true;
         } else {
@@ -143,6 +160,7 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         } else {
             isValid = false;
         }
+
         return isValid;
     }
 
@@ -150,18 +168,99 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.et_date:
+                createDatePicker();
                 break;
             case R.id.et_time:
+                createTimePicker();
                 break;
             case R.id.et_paid_people:
+                showPaidPeopleList();
                 break;
             case R.id.et_people_list:
+                showBillPeopleList();
                 break;
             case R.id.bt_save:
                 break;
             case R.id.bt_cancel:
                 break;
         }
+    }
+
+    private void showPaidPeopleList() {
+        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+
+        PeopleListDialogFragment dialogFragment = PeopleListDialogFragment.newInstance(createPaidPeopleList(), true, new PeopleListDialogFragment.PeopleListListener() {
+            @Override
+            public void memberAdded(BillData.BillPeople people, int position) {
+                finalPaidPeopleList.add(people);
+
+                paidPeopleList.get(position).setCheck(true);
+            }
+
+            @Override
+            public void memberRemoved(BillData.BillPeople people, int position) {
+                finalPaidPeopleList.remove(people);
+
+                paidPeopleList.get(position).setCheck(false);
+            }
+        });
+
+        dialogFragment.show(fragmentTransaction, "paid-people-list");
+    }
+
+    private void showBillPeopleList() {
+        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+
+        PeopleListDialogFragment dialogFragment = PeopleListDialogFragment.newInstance(createBillPeopleList(), false, new PeopleListDialogFragment.PeopleListListener() {
+            @Override
+            public void memberAdded(BillData.BillPeople people, int position) {
+                finalBillPeopleList.add(people);
+
+                billPeopleList.get(position).setCheck(true);
+            }
+
+            @Override
+            public void memberRemoved(BillData.BillPeople people, int position) {
+                finalBillPeopleList.remove(people);
+
+                billPeopleList.get(position).setCheck(false);
+            }
+        });
+
+        dialogFragment.show(fragmentTransaction, "bill-people-list");
+    }
+
+    private void createTimePicker() {
+        Calendar calendar = Calendar.getInstance();
+
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int min = calendar.get(Calendar.MINUTE);
+
+        TimePickerDialog pickerDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker timePicker, int i, int i1) {
+                etBillTime.setText(i + ":" + i1);
+            }
+        }, hour, min, true);
+
+        pickerDialog.show();
+    }
+
+    private void createDatePicker() {
+        Calendar calendar = Calendar.getInstance();
+
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int month = calendar.get(Calendar.MONTH);
+        int year = calendar.get(Calendar.YEAR);
+
+        DatePickerDialog pickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
+                Log.d("AddBillFragment", "Date picker : " + i + " " + i1 + 1 + " " + i2);
+            }
+        }, year, month, day);
+
+        pickerDialog.show();
     }
 
     //TODO : Remove all the static data
@@ -179,36 +278,32 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     }
 
     private ArrayList<BillData.BillPeople> createPaidPeopleList() {
-        ArrayList<BillData.BillPeople> billPeople = new ArrayList<>();
+        if (paidPeopleList == null) {
+            paidPeopleList = new ArrayList<>();
 
-        BillData.BillPeople data1 = new BillData.BillPeople();
-        data1.setPeopleName(tripData.getMemberName().get(0));
-        data1.setAmount(1000);
+            for (int i = 0; i < tripData.getMemberName().size(); i++) {
+                BillData.BillPeople people = new BillData.BillPeople();
+                people.setPeopleName(tripData.getMemberName().get(i));
 
-        billPeople.add(data1);
+                paidPeopleList.add(people);
+            }
+        }
 
-        return billPeople;
+        return paidPeopleList;
     }
 
     private ArrayList<BillData.BillPeople> createBillPeopleList() {
-        ArrayList<BillData.BillPeople> billPeople = new ArrayList<>();
+        if (billPeopleList == null) {
+            billPeopleList = new ArrayList<>();
 
-        BillData.BillPeople data1 = new BillData.BillPeople();
-        data1.setPeopleName(tripData.getMemberName().get(1));
-        data1.setAmount(1000 / 4);
+            for (int i = 0; i < tripData.getMemberName().size(); i++) {
+                BillData.BillPeople people = new BillData.BillPeople();
+                people.setPeopleName(tripData.getMemberName().get(i));
 
-        BillData.BillPeople data2 = new BillData.BillPeople();
-        data2.setPeopleName(tripData.getMemberName().get(2));
-        data2.setAmount(1000 / 4);
+                billPeopleList.add(people);
+            }
+        }
 
-        BillData.BillPeople data3 = new BillData.BillPeople();
-        data3.setPeopleName(tripData.getMemberName().get(3));
-        data3.setAmount(1000 / 4);
-
-        billPeople.add(data1);
-        billPeople.add(data2);
-        billPeople.add(data3);
-
-        return billPeople;
+        return billPeopleList;
     }
 }

@@ -66,7 +66,8 @@ public class BillsFragment extends Fragment {
         btAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                controller.navigate(R.id.action_billsFragment_to_addBillFragment);
+                BillsFragmentDirections.ActionBillsFragmentToAddBillFragment direction = BillsFragmentDirections.actionBillsFragmentToAddBillFragment(new Gson().toJson(tripData).toString());
+                controller.navigate(direction);
             }
         });
     }

@@ -6,12 +6,14 @@ import java.util.Date;
 
 public class Util {
     private static final String datePattern = "dd MMM yyyy";
+    private static final String timePattern = "HH:MM";
+    private static final String timeStampPattern = datePattern + " " + timePattern;
 
     public static long dateToMilli(String dateString) {
         long time = 0;
 
         try {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy HH:mm");
+            SimpleDateFormat dateFormat = new SimpleDateFormat(timeStampPattern);
 
             Date date = dateFormat.parse(dateString);
 
@@ -24,7 +26,7 @@ public class Util {
     }
 
     public static String milliToDate(long time) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("dd MMM yyyy HH:mm");
+        SimpleDateFormat dateFormat = new SimpleDateFormat(timeStampPattern);
 
         return dateFormat.format(new Date(time));
     }
