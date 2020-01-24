@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
@@ -34,14 +35,17 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     private TripData tripData;
 
     private EditText etBillName;
-    private EditText etBillDate;
-    private EditText etBillTime;
-    private EditText etBillPaidPeople;
-    private EditText etBillPeople;
+    private TextView etBillDate;
+    private TextView etBillTime;
+    private TextView etBillPaidPeople;
+    private TextView etBillPeople;
     private EditText etBillAmount;
 
     private Button btSave;
     private Button btCancel;
+
+    private int[] date = new int[3];
+    private int[] time = new int[2];
 
     private ArrayList<BillData.BillPeople> billPeopleList;
     private ArrayList<BillData.BillPeople> paidPeopleList;
@@ -98,13 +102,30 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         finalPaidPeopleList = new ArrayList<>();
 
         attachTextChangeListener(etBillName);
-        attachTextChangeListener(etBillDate);
         attachTextChangeListener(etBillAmount);
 
         etBillDate.setOnClickListener(this);
         etBillTime.setOnClickListener(this);
         etBillPeople.setOnClickListener(this);
         etBillPaidPeople.setOnClickListener(this);
+
+        setupDate();
+        setUpTime();
+    }
+
+    private void setupDate() {
+        Calendar calendar = Calendar.getInstance();
+
+        date[0] = calendar.get(Calendar.DAY_OF_MONTH);
+        date[1] = calendar.get(Calendar.MONTH);
+        date[2] = calendar.get(Calendar.YEAR);
+    }
+
+    private void setUpTime() {
+        Calendar calendar = Calendar.getInstance();
+
+        time[0] = calendar.get(Calendar.HOUR_OF_DAY);
+        time[1] = calendar.get(Calendar.MINUTE);
     }
 
     private void attachTextChangeListener(EditText editText) {
@@ -217,6 +238,8 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
                 finalBillPeopleList.add(people);
 
                 billPeopleList.get(position).setCheck(true);
+
+                Log.d("AddBillFragment : ", String.valueOf(finalBillPeopleList.size()));
             }
 
             @Override
@@ -224,6 +247,8 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
                 finalBillPeopleList.remove(people);
 
                 billPeopleList.get(position).setCheck(false);
+
+                Log.d("AddBillFragment : ", String.valueOf(finalBillPeopleList.size()));
             }
         });
 
@@ -231,34 +256,32 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     }
 
     private void createTimePicker() {
-        Calendar calendar = Calendar.getInstance();
-
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int min = calendar.get(Calendar.MINUTE);
-
         TimePickerDialog pickerDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker timePicker, int i, int i1) {
+                time[0] = i;
+                time[1] = i1;
+
                 etBillTime.setText(i + ":" + i1);
             }
-        }, hour, min, true);
+        }, time[0], time[1], true);
 
         pickerDialog.show();
     }
 
     private void createDatePicker() {
-        Calendar calendar = Calendar.getInstance();
-
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        int month = calendar.get(Calendar.MONTH);
-        int year = calendar.get(Calendar.YEAR);
-
         DatePickerDialog pickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
                 Log.d("AddBillFragment", "Date picker : " + i + " " + i1 + 1 + " " + i2);
+
+                date[0] = i2;
+                date[1] = i1;
+                date[2] = i;
+
+                etBillDate.setText(i2 + " " + i1 + 1 + " " + i);
             }
-        }, year, month, day);
+        }, date[2], date[1], date[0]);
 
         pickerDialog.show();
     }

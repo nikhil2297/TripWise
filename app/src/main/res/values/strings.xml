@@ -9,7 +9,7 @@
     <string name="text_canccel">Cancel</string>
     <string name="text_empty_list">Get some life</string>
     <string name="bill_name">Bill Name</string>
-    <string name="date_fromat">dd MMM yyyy</string>
+    <string name="date_fromat">DD MMM yyyy</string>
     <string name="time_optional_format">HH:mm (optional)</string>
     <string name="text_bill_paid_buy">Bill Paid by :</string>
     <string name="bill_help_message_1">Select Names</string>

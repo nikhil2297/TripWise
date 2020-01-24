@@ -10,8 +10,8 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Switch;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -27,11 +27,14 @@ public class PeopleListDialogFragment extends DialogFragment implements View.OnC
     private PeopleListListener peopleListListener;
 
     private ArrayList<BillData.BillPeople> billPeople;
+    private ArrayList<BillData.BillPeople> tempPeople;
 
     private boolean isPaid;
     private boolean isSelectAll;
 
-    private Switch switchSelectAll;
+    private LinearLayout llSelectAll;
+
+    private CheckBox checkSelectAll;
 
     private Button btSave;
     private Button btCancel;
@@ -43,6 +46,7 @@ public class PeopleListDialogFragment extends DialogFragment implements View.OnC
     public static PeopleListDialogFragment newInstance(ArrayList<BillData.BillPeople> billPeople, boolean isPaid, PeopleListListener listListener) {
         PeopleListDialogFragment dialogFragment = new PeopleListDialogFragment();
         dialogFragment.billPeople = billPeople;
+        dialogFragment.tempPeople = billPeople;
         dialogFragment.isPaid = isPaid;
         dialogFragment.peopleListListener = listListener;
 
@@ -62,9 +66,13 @@ public class PeopleListDialogFragment extends DialogFragment implements View.OnC
         btSave = view.findViewById(R.id.bt_save);
         btCancel = view.findViewById(R.id.bt_cancel);
 
-        switchSelectAll = view.findViewById(R.id.switch_select);
+        llSelectAll = view.findViewById(R.id.ll_select_all);
 
         lvPeople = view.findViewById(R.id.lv_bill_people);
+
+        checkSelectAll = llSelectAll.findViewById(R.id.is_check);
+
+        lvPeople.setClickable(false);
 
         init();
     }
@@ -76,12 +84,12 @@ public class PeopleListDialogFragment extends DialogFragment implements View.OnC
         }
 
         if (isPaid) {
-            switchSelectAll.setVisibility(View.GONE);
+            llSelectAll.setVisibility(View.GONE);
         } else {
-            switchSelectAll.setVisibility(View.VISIBLE);
+            llSelectAll.setVisibility(View.VISIBLE);
         }
 
-        switchSelectAll.setOnClickListener(this);
+        llSelectAll.setOnClickListener(this);
         btCancel.setOnClickListener(this);
         btSave.setOnClickListener(this);
     }
@@ -89,15 +97,15 @@ public class PeopleListDialogFragment extends DialogFragment implements View.OnC
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.switch_select:
-                if (switchSelectAll.isChecked()) {
-                    switchSelectAll.setChecked(false);
+            case R.id.ll_select_all:
+                if (checkSelectAll.isChecked()) {
+                    checkSelectAll.setChecked(false);
                 } else {
-                    switchSelectAll.setChecked(true);
+                    checkSelectAll.setChecked(true);
                 }
-                isSelectAll = switchSelectAll.isChecked();
+                isSelectAll = checkSelectAll.isChecked();
 
-                adapter.notifyDataSetChanged();
+                selectAll(isSelectAll);
                 break;
             case R.id.bt_save:
                 dismissAllowingStateLoss();
@@ -106,6 +114,22 @@ public class PeopleListDialogFragment extends DialogFragment implements View.OnC
                 dismissAllowingStateLoss();
                 break;
         }
+    }
+
+    private void selectAll(boolean isCheck) {
+        for (int i = 0; i < billPeople.size(); i++) {
+            billPeople.get(i).setCheck(isCheck);
+
+            if (isCheck) {
+                peopleListListener.memberAdded(billPeople.get(i), i);
+            } else {
+                peopleListListener.memberRemoved(billPeople.get(i), i);
+            }
+        }
+
+        adapter.billPeopleList = billPeople;
+
+        adapter.notifyDataSetChanged();
     }
 
     public interface PeopleListListener {

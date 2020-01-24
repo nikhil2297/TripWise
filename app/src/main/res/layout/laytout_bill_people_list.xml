@@ -4,16 +4,32 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Switch
-        android:id="@+id/switch_select"
+    <LinearLayout
+        android:id="@+id/ll_select_all"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
-        android:text="Select All"
-        android:textSize="20sp"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="0.7"
+            android:padding="10dp"
+            android:text="Select All"
+            android:textSize="20sp" />
+
+        <CheckBox
+            android:id="@+id/is_check"
+            android:layout_width="0dp"
+            android:padding="10dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="0.3" />
+    </LinearLayout>
 
     <ListView
         android:id="@+id/lv_bill_people"
@@ -24,7 +40,7 @@
         app:layout_constraintBottom_toTopOf="@+id/bt_save"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/switch_select" />
+        app:layout_constraintTop_toBottomOf="@+id/ll_select_all" />
 
     <Button
         android:id="@+id/bt_save"

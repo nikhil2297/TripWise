@@ -5,6 +5,7 @@
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/tv_help_message"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:textColor="@color/colorPrimaryDark"
@@ -24,31 +25,32 @@
         android:layout_height="wrap_content"
         android:background="@color/colorTransparent"
         android:hint="@string/bill_name"
+        android:inputType="none"
         android:padding="10dp"
         android:textSize="24sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="@+id/guideline3" />
+        app:layout_constraintTop_toBottomOf="@id/tv_help_message" />
 
-    <EditText
+    <TextView
         android:id="@+id/et_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/colorTransparent"
         android:hint="@string/date_fromat"
         android:padding="10dp"
-        android:textSize="24sp"
+        android:textSize="20sp"
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toBottomOf="@+id/et_bill_name" />
 
-    <EditText
+    <TextView
         android:id="@+id/et_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@color/colorTransparent"
         android:hint="@string/time_optional_format"
         android:padding="10dp"
-        android:textSize="24sp"
+        android:textSize="20sp"
         app:layout_constraintEnd_toStartOf="@+id/guideline2"
         app:layout_constraintStart_toEndOf="@+id/et_date"
         app:layout_constraintTop_toBottomOf="@+id/et_bill_name" />
@@ -63,7 +65,7 @@
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toBottomOf="@+id/et_date" />
 
-    <EditText
+    <TextView
         android:id="@+id/et_paid_people"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -86,7 +88,7 @@
         app:layout_constraintStart_toStartOf="@+id/guideline"
         app:layout_constraintTop_toBottomOf="@+id/et_paid_people" />
 
-    <EditText
+    <TextView
         android:id="@+id/et_people_list"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
