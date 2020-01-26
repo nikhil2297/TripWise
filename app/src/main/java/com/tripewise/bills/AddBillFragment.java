@@ -30,6 +30,7 @@ import com.tripewise.utilites.storage.tasks.PeopleAsyncConfig;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.concurrent.ExecutionException;
 
 public class AddBillFragment extends Fragment implements View.OnClickListener {
     private TripData tripData;
@@ -101,13 +102,13 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         finalBillPeopleList = new ArrayList<>();
         finalPaidPeopleList = new ArrayList<>();
 
-        attachTextChangeListener(etBillName);
-        attachTextChangeListener(etBillAmount);
-
         etBillDate.setOnClickListener(this);
         etBillTime.setOnClickListener(this);
         etBillPeople.setOnClickListener(this);
         etBillPaidPeople.setOnClickListener(this);
+
+        btSave.setOnClickListener(this);
+        btCancel.setOnClickListener(this);
 
         setupDate();
         setUpTime();
@@ -128,27 +129,6 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         time[1] = calendar.get(Calendar.MINUTE);
     }
 
-    private void attachTextChangeListener(EditText editText) {
-        editText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-                if (validation()) {
-                    btSave.setEnabled(true);
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable editable) {
-
-            }
-        });
-    }
-
     private boolean validation() {
         boolean isValid = false;
 
@@ -164,19 +144,13 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
             isValid = false;
         }
 
-        if (etBillName.getText().toString().length() > 1) {
+        if (finalPaidPeopleList.size() > 0) {
             isValid = true;
         } else {
             isValid = false;
         }
 
-        if (etBillName.getText().toString().length() > 1) {
-            isValid = true;
-        } else {
-            isValid = false;
-        }
-
-        if (etBillName.getText().toString().length() > 1) {
+        if (etBillAmount.getText().toString().length() > 1) {
             isValid = true;
         } else {
             isValid = false;
@@ -201,6 +175,20 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
                 showBillPeopleList();
                 break;
             case R.id.bt_save:
+                if (validation()) {
+                    BillData billData = createBillData();
+                    try {
+                        billAsyncConfig.insertBillData(billData);
+                    } catch (ExecutionException | InterruptedException e) {
+                        e.printStackTrace();
+                    }finally {
+                        try {
+                            peopleAsyncConfig.updatePersonData(billData);
+                        } catch (ExecutionException | InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
                 break;
             case R.id.bt_cancel:
                 break;
@@ -212,17 +200,13 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
 
         PeopleListDialogFragment dialogFragment = PeopleListDialogFragment.newInstance(createPaidPeopleList(), true, new PeopleListDialogFragment.PeopleListListener() {
             @Override
-            public void memberAdded(BillData.BillPeople people, int position) {
-                finalPaidPeopleList.add(people);
+            public void onBillDataChange(ArrayList<BillData.BillPeople> billPeople, String name) {
+                finalPaidPeopleList = billPeople;
 
-                paidPeopleList.get(position).setCheck(true);
-            }
+                updatePaidPeopleList();
 
-            @Override
-            public void memberRemoved(BillData.BillPeople people, int position) {
-                finalPaidPeopleList.remove(people);
-
-                paidPeopleList.get(position).setCheck(false);
+                etBillPaidPeople.setText(name);
+                Log.d("AddBillFragment : ", String.valueOf(finalPaidPeopleList.size()));
             }
         });
 
@@ -234,25 +218,26 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
 
         PeopleListDialogFragment dialogFragment = PeopleListDialogFragment.newInstance(createBillPeopleList(), false, new PeopleListDialogFragment.PeopleListListener() {
             @Override
-            public void memberAdded(BillData.BillPeople people, int position) {
-                finalBillPeopleList.add(people);
+            public void onBillDataChange(ArrayList<BillData.BillPeople> billPeople, String name) {
+                finalBillPeopleList = billPeople;
 
-                billPeopleList.get(position).setCheck(true);
-
-                Log.d("AddBillFragment : ", String.valueOf(finalBillPeopleList.size()));
-            }
-
-            @Override
-            public void memberRemoved(BillData.BillPeople people, int position) {
-                finalBillPeopleList.remove(people);
-
-                billPeopleList.get(position).setCheck(false);
-
+                if (!name.equals(null)) {
+                    etBillPeople.setText(name);
+                }
                 Log.d("AddBillFragment : ", String.valueOf(finalBillPeopleList.size()));
             }
         });
 
         dialogFragment.show(fragmentTransaction, "bill-people-list");
+    }
+
+    private void updatePaidPeopleList() {
+        for (int i = 0 ; i < finalPaidPeopleList.size(); i++){
+            BillData.BillPeople billPeople = finalPaidPeopleList.get(i);
+
+            paidPeopleList.get(i).setCheck(billPeople.isCheck());
+            paidPeopleList.get(i).setAmount(billPeople.getAmount());
+        }
     }
 
     private void createTimePicker() {
@@ -286,18 +271,25 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         pickerDialog.show();
     }
 
-    //TODO : Remove all the static data
     private BillData createBillData() {
         BillData data = new BillData();
-        data.setBillName("Morning Lunch");
-        data.setBillAmount(1000);
-        data.setBillTime(Util.dateToMilli("15 Jan 2019 00:00"));
-        data.setBillTimeString("15 Jan 2019 00:00");
-        data.setTripId(1);
-        data.setBillPaidPeopleList(createPaidPeopleList());
-        data.setBillPeopleList(createBillPeopleList());
+        data.setBillName(etBillName.getText().toString());
+        data.setBillAmount(Integer.parseInt(etBillAmount.getText().toString()));
+        data.setBillTime(Util.dateToMilli(createDate()));
+        data.setBillTimeString(createDate());
+        data.setTripId(tripData.getId());
+        data.setBillPaidPeopleList(finalPaidPeopleList);
+        data.setBillPeopleList(createFinalBillPeopleList());
 
         return data;
+    }
+
+    private String createDate() {
+        if (!etBillTime.getText().toString().equals(null)) {
+            return etBillDate.getText().toString() + " " + etBillTime.getText().toString();
+        } else {
+            return etBillTime.getText().toString() + " " + "00:00";
+        }
     }
 
     private ArrayList<BillData.BillPeople> createPaidPeopleList() {
@@ -313,6 +305,28 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         }
 
         return paidPeopleList;
+    }
+
+    private ArrayList<BillData.BillPeople> createFinalBillPeopleList() {
+        if (finalBillPeopleList.size() > 0) {
+            return sortBillPeople(finalBillPeopleList);
+        } else {
+            return sortBillPeople(createBillPeopleList());
+        }
+    }
+
+    private ArrayList<BillData.BillPeople> sortBillPeople(ArrayList<BillData.BillPeople> newBillPeopleList) {
+        for (int i = 0; i < finalPaidPeopleList.size(); i++) {
+            BillData.BillPeople paidPeople = finalPaidPeopleList.get(i);
+
+            for (int j = 0; j < newBillPeopleList.size(); j++) {
+                BillData.BillPeople billPeople = newBillPeopleList.get(j);
+                if (!paidPeople.getPeopleName().equals(billPeople.getPeopleName())) {
+                    billPeople.setAmount(billPeople.getAmount() + (paidPeople.getAmount() / newBillPeopleList.size()));
+                }
+            }
+        }
+        return newBillPeopleList;
     }
 
     private ArrayList<BillData.BillPeople> createBillPeopleList() {

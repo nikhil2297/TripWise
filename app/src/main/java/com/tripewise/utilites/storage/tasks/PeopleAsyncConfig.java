@@ -87,6 +87,8 @@ public class PeopleAsyncConfig {
         PersonUtils personUtils = new PersonUtils(billData, personDataList);
 
         for (PersonData personData : personUtils.initPersonData()) {
+            Log.d("PeopleAsyncConfig : ", new Gson().toJson(personData).toString());
+
             updatePersonData(personData);
         }
     }

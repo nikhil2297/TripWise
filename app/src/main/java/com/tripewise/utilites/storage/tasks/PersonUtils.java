@@ -23,10 +23,13 @@ public class PersonUtils {
         getPaidPeopleData();
 
         for (PersonData data : personData) {
-            if (!sortReceivingDetails(data)) {
-                sortSendDetails(data);
-            }
+            sortReceivingDetails(data);
         }
+
+        for (PersonData data : personData) {
+            sortSendDetails(data);
+        }
+
         return personData;
     }
 
@@ -61,7 +64,7 @@ public class PersonUtils {
         if (data != null && data.getPaymentData().getPaidDetails() != null) {
             PaymentDetailsData paymentDetailsData = data.getPaymentData();
 
-            ArrayList<PaymentDetailsData.Details> detailsArrayList = new ArrayList<>();
+            ArrayList<PaymentDetailsData.Details> detailsArrayList = paymentDetailsData.getReceiveDetails();
 
             int receivingPeopleSize = paymentDetailsData.getReceiveDetails().size();
             int paidPeopleSize = billData.getBillPaidPeopleList().size();
@@ -71,10 +74,10 @@ public class PersonUtils {
                     for (int j = 0; j < receivingPeopleSize; j++) {
                         PaymentDetailsData.Details details = paymentDetailsData.getReceiveDetails().get(j);
 
-                        details.setAmount(details.getAmount() + billData.getBillPeopleList().get(i).getAmount());
+                        details.setAmount(details.getAmount() + (billData.getBillPaidPeopleList().get(i).getAmount() / billData.getBillPeopleList().size()));
                         details.setName(details.getName());
 
-                        detailsArrayList.add(details);
+                        detailsArrayList.set(j, details);
                     }
                 }
             }
@@ -92,7 +95,7 @@ public class PersonUtils {
         if (data != null) {
             PaymentDetailsData paymentDetailsData = data.getPaymentData();
 
-            ArrayList<PaymentDetailsData.Details> detailsArrayList = new ArrayList<>();
+            ArrayList<PaymentDetailsData.Details> detailsArrayList = data.getPaymentData().getSendDetails();
 
             int sendingPeopleSize = paymentDetailsData.getSendDetails().size();
             int paidPeopleSize = billData.getBillPaidPeopleList().size();
@@ -105,19 +108,24 @@ public class PersonUtils {
                         PaymentDetailsData.Details details = paymentDetailsData.getSendDetails().get(i);
 
                         if (data.getPaymentData().getSendDetails().get(i).getName().equals(billPersonName)) {
-                            details.setAmount(details.getAmount() + billData.getBillPeopleList().get(i).getAmount());
-                        } else {
+                            details.setAmount(details.getAmount() + (billData.getBillPaidPeopleList().get(j).getAmount() / billData.getBillPeopleList().size()));
+                        }else {
                             details.setAmount(details.getAmount());
                         }
 
-                        detailsArrayList.add(details);
+                        detailsArrayList.set(i, details);
                     }
                 }
             }
+
 
             paymentDetailsData.setSendDetails(detailsArrayList);
 
             data.setPaymentData(paymentDetailsData);
         }
+    }
+
+    private void sortSendDetailsResult(ArrayList<PaymentDetailsData.Details> detailsArrayList){
+
     }
 }

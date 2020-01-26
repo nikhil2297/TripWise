@@ -1,10 +1,14 @@
 package com.tripewise.bills;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -13,10 +17,13 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.tripewise.R;
 import com.tripewise.utilites.storage.data.BillData;
@@ -39,7 +46,7 @@ public class PeopleListDialogFragment extends DialogFragment implements View.OnC
     private Button btSave;
     private Button btCancel;
 
-    private ListView lvPeople;
+    private RecyclerView rvPeople;
 
     private BillPeopleAdapter adapter;
 
@@ -51,6 +58,13 @@ public class PeopleListDialogFragment extends DialogFragment implements View.OnC
         dialogFragment.peopleListListener = listListener;
 
         return dialogFragment;
+    }
+
+    @Override
+    public void setupDialog(@NonNull Dialog dialog, int style) {
+        super.setupDialog(dialog, style);
+
+        dialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
     }
 
     @Nullable
@@ -68,19 +82,22 @@ public class PeopleListDialogFragment extends DialogFragment implements View.OnC
 
         llSelectAll = view.findViewById(R.id.ll_select_all);
 
-        lvPeople = view.findViewById(R.id.lv_bill_people);
+        rvPeople = view.findViewById(R.id.rv_bill_people);
 
         checkSelectAll = llSelectAll.findViewById(R.id.is_check);
 
-        lvPeople.setClickable(false);
+        llSelectAll.setClickable(false);
 
         init();
     }
 
     private void init() {
         if (adapter == null) {
+            LinearLayoutManager manager = new LinearLayoutManager(rvPeople.getContext());
+            rvPeople.setLayoutManager(manager);
+
             adapter = new BillPeopleAdapter(getActivity(), billPeople, isPaid, isSelectAll);
-            lvPeople.setAdapter(adapter);
+            rvPeople.setAdapter(adapter);
         }
 
         if (isPaid) {
@@ -108,7 +125,17 @@ public class PeopleListDialogFragment extends DialogFragment implements View.OnC
                 selectAll(isSelectAll);
                 break;
             case R.id.bt_save:
-                dismissAllowingStateLoss();
+                if (isPaid) {
+                    if (adapter.finalBillPeopleList.size() > 0) {
+                        peopleListListener.onBillDataChange(adapter.finalBillPeopleList, createTextFiledName());
+                        dismissAllowingStateLoss();
+                    } else {
+                        Toast.makeText(getActivity(), "Please select atleast on member", Toast.LENGTH_LONG);
+                    }
+                } else {
+                    peopleListListener.onBillDataChange(adapter.finalBillPeopleList, createTextFiledName());
+                    dismissAllowingStateLoss();
+                }
                 break;
             case R.id.bt_cancel:
                 dismissAllowingStateLoss();
@@ -116,15 +143,21 @@ public class PeopleListDialogFragment extends DialogFragment implements View.OnC
         }
     }
 
+    private String createTextFiledName() {
+        String name = "";
+        for (BillData.BillPeople people : adapter.finalBillPeopleList) {
+            if (!name.equals(""))
+                name = name + ", " + people.getPeopleName();
+            else
+                name = people.getPeopleName();
+        }
+
+        return name;
+    }
+
     private void selectAll(boolean isCheck) {
         for (int i = 0; i < billPeople.size(); i++) {
             billPeople.get(i).setCheck(isCheck);
-
-            if (isCheck) {
-                peopleListListener.memberAdded(billPeople.get(i), i);
-            } else {
-                peopleListListener.memberRemoved(billPeople.get(i), i);
-            }
         }
 
         adapter.billPeopleList = billPeople;
@@ -133,42 +166,42 @@ public class PeopleListDialogFragment extends DialogFragment implements View.OnC
     }
 
     public interface PeopleListListener {
-        void memberAdded(BillData.BillPeople people, int position);
-
-        void memberRemoved(BillData.BillPeople people, int position);
+        void onBillDataChange(ArrayList<BillData.BillPeople> billPeople, String name);
     }
 
 
-    public class BillPeopleAdapter extends BaseAdapter {
+    public class BillPeopleAdapter extends RecyclerView.Adapter<BillPeopleAdapter.ItemHolder> {
         private Context context;
 
         private ArrayList<BillData.BillPeople> billPeopleList;
+        private ArrayList<BillData.BillPeople> finalBillPeopleList;
 
         private boolean isPaid;
         private boolean isSelectAll;
-
-        private TextView tvBillPeopleName;
-        private TextView tvBillAmount;
-
-        private EditText etAmount;
-
-        private CheckBox checkBox;
 
         BillPeopleAdapter(Context context, ArrayList<BillData.BillPeople> billPeopleList, boolean isPaid, boolean isSelectAll) {
             this.billPeopleList = billPeopleList;
             this.context = context;
             this.isPaid = isPaid;
             this.isSelectAll = isSelectAll;
+
+            finalBillPeopleList = new ArrayList<>();
+        }
+
+        @NonNull
+        @Override
+        public ItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            return new ItemHolder(LayoutInflater.from(parent.getContext()).
+                    inflate(R.layout.layout_bill_paid_item, parent, false));
         }
 
         @Override
-        public int getCount() {
-            return billPeopleList.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return billPeopleList.get(i);
+        public void onBindViewHolder(@NonNull ItemHolder holder, int position) {
+            if (isPaid) {
+                initPaidPeople(holder, billPeopleList.get(position), position);
+            } else {
+                initBillPeople(holder, billPeopleList.get(position), position);
+            }
         }
 
         @Override
@@ -177,69 +210,108 @@ public class PeopleListDialogFragment extends DialogFragment implements View.OnC
         }
 
         @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            view = LayoutInflater.from(context).inflate(R.layout.layout_bill_paid_item, viewGroup, false);
-
-            tvBillPeopleName = view.findViewById(R.id.tv_person_name);
-            tvBillAmount = view.findViewById(R.id.tv_amount_to_paid);
-
-            etAmount = view.findViewById(R.id.et_paid_amount);
-
-            checkBox = view.findViewById(R.id.cb_paid);
-
-            if (isPaid) {
-                initPaidPeople(billPeopleList.get(i), i);
-            } else {
-                initBillPeople(billPeopleList.get(i), i);
-            }
-
-            return view;
+        public int getItemCount() {
+            return billPeopleList.size();
         }
 
-        private void initPaidPeople(final BillData.BillPeople people, final int position) {
-            tvBillPeopleName.setText(people.getPeopleName());
-            tvBillAmount.setText(context.getResources().getString(R.string.amount, people.getAmount()));
+        private void initPaidPeople(final ItemHolder holder, final BillData.BillPeople people, final int position) {
+            holder.tvBillPeopleName.setText(people.getPeopleName());
+            holder.tvBillAmount.setText(context.getResources().getString(R.string.amount, people.getAmount()));
 
-            checkBox.setChecked(people.isCheck());
+            if (people.isCheck()) {
+                holder.checkBox.setChecked(true);
+                holder.etAmount.setVisibility(View.VISIBLE);
+                holder.etAmount.setText(String.valueOf(people.getAmount()));
+            } else {
+                holder.checkBox.setChecked(false);
+                holder.etAmount.setVisibility(View.GONE);
+                holder.etAmount.setText("");
+            }
 
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            holder.checkBox.setChecked(people.isCheck());
+
+            holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     if (b) {
-                        etAmount.setVisibility(View.VISIBLE);
-
-                        peopleListListener.memberAdded(people, position);
+                        holder.etAmount.setVisibility(View.VISIBLE);
+                        holder.etAmount.setText(people.getAmount() > 0 ? String.valueOf(people.getAmount()) : "");
                     } else {
-                        etAmount.setVisibility(View.GONE);
-
-                        peopleListListener.memberRemoved(people, position);
+                        holder.etAmount.setVisibility(View.GONE);
+                        holder.etAmount.setText("");
                     }
+
+                    people.setCheck(b);
+                }
+            });
+
+            holder.etAmount.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+                }
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (s.length() > 0) {
+                        people.setAmount(Long.parseLong(s.toString()));
+
+                        finalBillPeopleList.remove(people);
+                        finalBillPeopleList.add(people);
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
                 }
             });
         }
 
-        private void initBillPeople(final BillData.BillPeople people, final int position) {
-            tvBillPeopleName.setText(people.getPeopleName());
-            tvBillAmount.setText(context.getResources().getString(R.string.amount, people.getAmount()));
+        private void initBillPeople(ItemHolder holder, final BillData.BillPeople people, final int position) {
+            holder.tvBillPeopleName.setText(people.getPeopleName());
+            holder.tvBillAmount.setText(context.getResources().getString(R.string.amount, people.getAmount()));
+
+            holder.checkBox.setVisibility(View.VISIBLE);
 
             if (isSelectAll) {
-                checkBox.setChecked(true);
+                holder.checkBox.setChecked(true);
             } else {
-                checkBox.setChecked(false);
+                holder.checkBox.setChecked(false);
             }
 
-            checkBox.setChecked(people.isCheck());
+            holder.checkBox.setChecked(people.isCheck());
 
-            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
                     if (b) {
-                        peopleListListener.memberAdded(people, position);
+                        finalBillPeopleList.add(people);
                     } else {
-                        peopleListListener.memberRemoved(people, position);
+                        finalBillPeopleList.remove(people);
                     }
                 }
             });
+        }
+
+        class ItemHolder extends RecyclerView.ViewHolder {
+            TextView tvBillPeopleName;
+            TextView tvBillAmount;
+
+            EditText etAmount;
+
+            CheckBox checkBox;
+
+            ItemHolder(@NonNull View view) {
+                super(view);
+
+                tvBillPeopleName = view.findViewById(R.id.tv_person_name);
+                tvBillAmount = view.findViewById(R.id.tv_amount_to_paid);
+
+                etAmount = view.findViewById(R.id.et_paid_amount);
+
+                checkBox = view.findViewById(R.id.cb_paid);
+            }
         }
     }
 }

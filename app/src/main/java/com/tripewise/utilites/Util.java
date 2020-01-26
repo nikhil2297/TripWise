@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Util {
-    private static final String datePattern = "dd MMM yyyy";
+    private static final String datePattern = "d MMM yyyy";
     private static final String timePattern = "HH:MM";
     private static final String timeStampPattern = datePattern + " " + timePattern;
 
