@@ -4,24 +4,19 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ExpandableListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDirections;
 import androidx.navigation.fragment.NavHostFragment;
-import androidx.recyclerview.widget.DividerItemDecoration;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.gson.Gson;
 import com.tripewise.R;
-import com.tripewise.utilites.storage.TripStorage;
 import com.tripewise.utilites.storage.data.TripData;
 import com.tripewise.utilites.storage.tasks.TripAsyncConfig;
 
@@ -30,7 +25,7 @@ import java.util.List;
 public class TripFragment extends Fragment implements TripsAdapter.ItemClickListener, View.OnClickListener {
     private FloatingActionButton addTrip;
 
-    private RecyclerView lvTrips;
+    private ExpandableListView exlvTrips;
 
     private List<TripData> tripDataList;
 
@@ -56,15 +51,12 @@ public class TripFragment extends Fragment implements TripsAdapter.ItemClickList
 
         tvHelpText = view.findViewById(R.id.tv_help_message);
 
-        lvTrips = view.findViewById(R.id.lv_trip);
+        exlvTrips = view.findViewById(R.id.exlv_trip);
+    }
 
-        LinearLayoutManager manager = new LinearLayoutManager(getActivity());
-        lvTrips.setLayoutManager(manager);
-
-        DividerItemDecoration itemDecoration = new DividerItemDecoration(lvTrips.getContext(), DividerItemDecoration.VERTICAL);
-        itemDecoration.setDrawable(getResources().getDrawable(R.drawable.recycler_view_divider));
-
-        lvTrips.addItemDecoration(itemDecoration);
+    @Override
+    public void onResume() {
+        super.onResume();
 
         getTripData();
     }
@@ -86,7 +78,7 @@ public class TripFragment extends Fragment implements TripsAdapter.ItemClickList
                 } else {
                     tripDataList = tripData;
                     adapter = new TripsAdapter(getActivity(), tripDataList);
-                    lvTrips.setAdapter(adapter);
+                    exlvTrips.setAdapter(adapter);
 
                     adapter.setOnItemClickListener(TripFragment.this);
                 }
@@ -101,15 +93,20 @@ public class TripFragment extends Fragment implements TripsAdapter.ItemClickList
     }
 
     @Override
-    public void onClick(TripData tripData) {
+    public void onClick(View view) {
+        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+        TripDialogFragment tripDialogFragment = new TripDialogFragment();
+        tripDialogFragment.show(fragmentTransaction, "adding");
+    }
+
+    @Override
+    public void onBillClick(TripData tripData) {
         TripFragmentDirections.ActionTripFragmentToBillsFragment direction = TripFragmentDirections.actionTripFragmentToBillsFragment(new Gson().toJson(tripData).toString());
         controller.navigate(direction);
     }
 
     @Override
-    public void onClick(View view) {
-        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-        TripDialogFragment tripDialogFragment = new TripDialogFragment();
-        tripDialogFragment.show(fragmentTransaction, "adding");
+    public void onPeopleClick(TripData tripData) {
+
     }
 }

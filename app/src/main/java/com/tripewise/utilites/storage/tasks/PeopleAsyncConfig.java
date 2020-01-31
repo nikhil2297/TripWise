@@ -12,7 +12,6 @@ import com.tripewise.utilites.storage.TripStorage;
 import com.tripewise.utilites.storage.data.BillData;
 import com.tripewise.utilites.storage.data.PersonData;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
@@ -104,5 +103,11 @@ public class PeopleAsyncConfig {
         protected Integer doInBackground(Void... voids) {
             return storage.personDao().updatePersonData(data);
         }
+    }
+
+    public List<PersonData> getCalculatedPersonResult() {
+        PersonUtils personUtils = new PersonUtils(null, personDataList);
+
+        return personUtils.finalCalculation();
     }
 }

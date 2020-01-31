@@ -33,9 +33,8 @@
         android:layout_marginBottom="20dp"
         android:clickable="true"
         android:focusable="true"
-        android:foreground="@drawable/ic_add_circle_black"
-        android:src="@drawable/ic_lens_black_24dp"
-        app:backgroundTint="#FFF"
+        android:src="@drawable/ic_add_black"
+        app:backgroundTint="@color/colorSecondary"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

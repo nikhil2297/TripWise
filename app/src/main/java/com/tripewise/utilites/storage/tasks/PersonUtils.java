@@ -109,7 +109,7 @@ public class PersonUtils {
 
                         if (data.getPaymentData().getSendDetails().get(i).getName().equals(billPersonName)) {
                             details.setAmount(details.getAmount() + (billData.getBillPaidPeopleList().get(j).getAmount() / billData.getBillPeopleList().size()));
-                        }else {
+                        } else {
                             details.setAmount(details.getAmount());
                         }
 
@@ -125,7 +125,67 @@ public class PersonUtils {
         }
     }
 
-    private void sortSendDetailsResult(ArrayList<PaymentDetailsData.Details> detailsArrayList){
+    List<PersonData> finalCalculation() {
 
+        for (PersonData data : personData) {
+            calculatePaymentDetails(data);
+        }
+
+        return personData;
+    }
+
+    private void calculatePaymentDetails(PersonData personData) {
+        PaymentDetailsData detailsData = personData.getPaymentData();
+
+        int receivingPeopleSize = detailsData.getReceiveDetails().size();
+        int sendingPeopleSize = detailsData.getSendDetails().size();
+
+        for (int i = 0; i < receivingPeopleSize; i++) {
+            PaymentDetailsData.Details receivingDetails = detailsData.getReceiveDetails().get(i);
+
+            for (int j = 0; j < sendingPeopleSize; j++) {
+                PaymentDetailsData.Details sendingDetails = detailsData.getSendDetails().get(j);
+
+                if (receivingDetails.getName().equals(sendingDetails.getName())) {
+                    long receiveAmount = receivingDetails.getAmount();
+                    long sendingAmount = sendingDetails.getAmount();
+
+                    long finalResult = receiveAmount - sendingAmount;
+
+                    if (finalResult > 0) {
+
+                        //Creating object for receiving data
+                        PaymentDetailsData.Details details = new PaymentDetailsData.Details();
+                        details.setAmount(finalResult);
+                        details.setName(receivingDetails.getName());
+
+                        detailsData.getReceiveDetails().set(i, details);
+
+                        //Create object for sending data
+                        PaymentDetailsData.Details details2 = new PaymentDetailsData.Details();
+                        details2.setName(sendingDetails.getName());
+                        details2.setAmount(0);
+
+                        detailsData.getSendDetails().set(j, details2);
+                    } else {
+                        //Creating object for receiving data
+                        PaymentDetailsData.Details details = new PaymentDetailsData.Details();
+                        details.setAmount(0);
+                        details.setName(receivingDetails.getName());
+
+                        detailsData.getReceiveDetails().set(i, details);
+
+                        //Create object for sending data
+                        PaymentDetailsData.Details details2 = new PaymentDetailsData.Details();
+                        details2.setName(sendingDetails.getName());
+                        details2.setAmount(Math.abs(finalResult));
+
+                        detailsData.getSendDetails().set(j, details2);
+                    }
+                }
+            }
+        }
+
+        personData.setPaymentData(detailsData);
     }
 }

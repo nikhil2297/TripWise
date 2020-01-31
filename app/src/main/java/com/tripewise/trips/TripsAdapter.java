@@ -4,107 +4,171 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.webkit.WebView;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
-import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
 import com.tripewise.R;
 import com.tripewise.utilites.storage.data.TripData;
-import com.tripewise.utilites.storage.tasks.TripAsyncConfig;
-import com.zerobranch.layout.SwipeLayout;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-public class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.ItemHolder> {
+public class TripsAdapter extends BaseExpandableListAdapter {
     private Context context;
 
     private List<TripData> tripData;
 
     private ItemClickListener listener;
 
-    public TripsAdapter(Context context, List<TripData> tripData) {
+    TripsAdapter(Context context, List<TripData> tripData) {
         this.context = context;
         this.tripData = tripData;
     }
 
-    @NonNull
-    @Override
-    public TripsAdapter.ItemHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        return new ItemHolder(LayoutInflater.from(context).inflate(R.layout.layout_trip_card, parent, false));
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull final TripsAdapter.ItemHolder holder, final int i) {
-        holder.tvTripData.setText(context.getResources().getString(R.string.trip_people, tripData.get(i).getMemberCount(), tripData.get(i).getBillCount()));
-        holder.tvTripName.setText(tripData.get(i).getTripName());
-
-        holder.ivDelete.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    new TripAsyncConfig(context).deleteTrip(tripData.get(i).getId());
-
-                    tripData.remove(i);
-
-                    notifyItemRemoved(i);
-                    holder.itemView.setVisibility(View.GONE);
-                } catch (ExecutionException | InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        holder.tripDetailsLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                listener.onClick(tripData.get(i));
-            }
-        });
-    }
-
-    @Override
-    public int getItemCount() {
-        return tripData.size();
-    }
-
-    class ItemHolder extends RecyclerView.ViewHolder {
-        TextView tvTripName;
-        TextView tvTripData;
-
-        ImageView ivDelete;
-
-        MaterialCardView mainLayout;
-
-        SwipeLayout tripSwipeLayout;
-
-        ConstraintLayout tripDetailsLayout;
-
-        ItemHolder(@NonNull View view) {
-            super(view);
-
-            tvTripName = view.findViewById(R.id.tv_trip_name);
-            tvTripData = view.findViewById(R.id.tv_trip_data);
-
-            ivDelete = view.findViewById(R.id.iv_delete);
-
-            mainLayout = view.findViewById(R.id.trip_card);
-
-            tripSwipeLayout = mainLayout.findViewById(R.id.trip_swipe_layout);
-
-            tripDetailsLayout = tripSwipeLayout.findViewById(R.id.parent);
-        }
-    }
-
-    public void setOnItemClickListener(ItemClickListener l) {
+    void setOnItemClickListener(ItemClickListener l) {
         this.listener = l;
     }
 
+    @Override
+    public int getGroupCount() {
+        return tripData.size();
+    }
+
+    @Override
+    public int getChildrenCount(int i) {
+        return 1;
+    }
+
+    @Override
+    public Object getGroup(int i) {
+        return tripData.get(i);
+    }
+
+    @Override
+    public Object getChild(int i, int i1) {
+        return tripData.get(i);
+    }
+
+    @Override
+    public long getGroupId(int i) {
+        return 0;
+    }
+
+    @Override
+    public long getChildId(int i, int i1) {
+        return 0;
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        return false;
+    }
+
+    @Override
+    public View getGroupView(final int i, boolean b, View view, ViewGroup viewGroup) {
+        final ParentItemHolder holder;
+
+        if (view == null) {
+            view = LayoutInflater.from(context).inflate(R.layout.layout_trip_card, viewGroup, false);
+
+            holder = new ParentItemHolder(view);
+
+            view.setTag(holder);
+        } else {
+            holder = (ParentItemHolder) view.getTag();
+        }
+
+        String id;
+
+        holder.tvTripData.setText(context.getResources().getString(R.string.trip_people, tripData.get(i).getMemberCount(), tripData.get(i).getBillCount()));
+        holder.tvTripName.setText(tripData.get(i).getTripName());
+
+        holder.webGif.loadUrl(tripData.get(i).getGifPath());
+        holder.webGif.getSettings().setLoadWithOverviewMode(true);
+        holder.webGif.getSettings().setUseWideViewPort(true);
+
+        return view;
+    }
+
+    @Override
+    public View getChildView(int i, int i1, boolean b, View view, ViewGroup viewGroup) {
+        final ChildItemHolder holder;
+
+        final TripData data = (TripData) getChild(i, i1);
+
+        if (view == null) {
+            view = LayoutInflater.from(context).inflate(R.layout.layout_child_trip_card, viewGroup, false);
+
+            holder = new ChildItemHolder(view);
+
+            view.setTag(holder);
+        } else {
+            holder = (ChildItemHolder) view.getTag();
+        }
+
+        holder.tvPeople.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onPeopleClick(data);
+            }
+        });
+
+        holder.tvBill.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onBillClick(data);
+            }
+        });
+
+        return view;
+    }
+
+    @Override
+    public boolean isChildSelectable(int i, int i1) {
+        return true;
+    }
+
     public interface ItemClickListener {
-        void onClick(TripData tripData);
+        void onBillClick(TripData tripData);
+
+        void onPeopleClick(TripData tripData);
+    }
+
+    class ParentItemHolder {
+        TextView tvTripName;
+        TextView tvTripData;
+
+        MaterialCardView mainLayout;
+
+        ConstraintLayout tripDetailsLayout;
+
+        WebView webGif;
+
+        ParentItemHolder(View view) {
+            tvTripName = view.findViewById(R.id.tv_trip_name);
+            tvTripData = view.findViewById(R.id.tv_trip_data);
+
+            mainLayout = view.findViewById(R.id.trip_card);
+
+            tripDetailsLayout = view.findViewById(R.id.parent);
+
+            webGif = view.findViewById(R.id.gif_web);
+
+            webGif.setClickable(true);
+
+        }
+    }
+
+    class ChildItemHolder {
+        TextView tvBill;
+        TextView tvPeople;
+
+        ChildItemHolder(View view) {
+            tvBill = view.findViewById(R.id.tv_bill);
+            tvPeople = view.findViewById(R.id.tv_people);
+        }
     }
 }

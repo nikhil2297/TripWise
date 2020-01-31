@@ -23,6 +23,9 @@ public class TripData {
     @ColumnInfo(name = "bill_count")
     private int billCount;
 
+    @ColumnInfo(name = "gif_path")
+    private String gifPath;
+
     public int getId() {
         return id;
     }
@@ -61,5 +64,13 @@ public class TripData {
 
     public void setBillCount(int billCount) {
         this.billCount = billCount;
+    }
+
+    public String getGifPath() {
+        return gifPath;
+    }
+
+    public void setGifPath(String gifPath) {
+        this.gifPath = gifPath;
     }
 }

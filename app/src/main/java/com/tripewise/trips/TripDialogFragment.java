@@ -19,6 +19,7 @@ import androidx.fragment.app.DialogFragment;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.tripewise.R;
+import com.tripewise.utilites.Util;
 import com.tripewise.utilites.storage.data.PaymentDetailsData;
 import com.tripewise.utilites.storage.data.PersonData;
 import com.tripewise.utilites.storage.data.TripData;
@@ -159,6 +160,7 @@ public class TripDialogFragment extends DialogFragment implements View.OnClickLi
                     data.setTripName(etTripName.getText().toString());
                     data.setMemberName(memberName);
                     data.setMemberCount(memberName.size());
+                    data.setGifPath(Util.createGif());
 
                     try {
                         asyncConfig.insertTripData(data);
