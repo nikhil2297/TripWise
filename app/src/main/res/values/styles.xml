@@ -17,4 +17,17 @@
         <item name="android:windowIsFloating">true</item>
         <item name="android:windowBackground">@android:color/transparent</item>
     </style>
+
+    <style name="chipAddTextAppearance" parent="TextAppearance.MaterialComponents.Chip">
+        <item name="android:textSize">54sp</item>
+    </style>
+
+    <style name="chipTextAppearance" parent="TextAppearance.MaterialComponents.Chip">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="miniChipTextAppearance" parent="TextAppearance.MaterialComponents.Chip">
+        <item name="android:textSize">8sp</item>
+    </style>
 </resources>

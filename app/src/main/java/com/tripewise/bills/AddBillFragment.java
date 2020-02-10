@@ -1,19 +1,11 @@
 package com.tripewise.bills;
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
-import android.widget.TextView;
-import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -22,31 +14,23 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.gson.Gson;
 import com.tripewise.R;
-import com.tripewise.utilites.Util;
+import com.tripewise.utilites.CustomEditText;
 import com.tripewise.utilites.storage.data.BillData;
 import com.tripewise.utilites.storage.data.TripData;
 import com.tripewise.utilites.storage.tasks.BillAsyncConfig;
 import com.tripewise.utilites.storage.tasks.PeopleAsyncConfig;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.concurrent.ExecutionException;
 
 public class AddBillFragment extends Fragment implements View.OnClickListener {
     private TripData tripData;
 
-    private EditText etBillName;
-    private TextView etBillDate;
-    private TextView etBillTime;
-    private TextView etBillPaidPeople;
-    private TextView etBillPeople;
-    private EditText etBillAmount;
+    private CustomEditText etBillName;
+    private CustomEditText etBillAmount;
 
     private Button btSave;
     private Button btCancel;
-
-    private int[] date = new int[3];
-    private int[] time = new int[2];
 
     private ArrayList<BillData.BillPeople> billPeopleList;
     private ArrayList<BillData.BillPeople> paidPeopleList;
@@ -83,13 +67,13 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
 
         etBillName = view.findViewById(R.id.et_bill_name);
         etBillAmount = view.findViewById(R.id.et_amount);
-        etBillDate = view.findViewById(R.id.et_date);
+/*        etBillDate = view.findViewById(R.id.et_date);
         etBillTime = view.findViewById(R.id.et_time);
         etBillPaidPeople = view.findViewById(R.id.et_paid_people);
         etBillPeople = view.findViewById(R.id.et_people_list);
 
         btSave = view.findViewById(R.id.bt_save);
-        btCancel = view.findViewById(R.id.bt_cancel);
+        btCancel = view.findViewById(R.id.bt_cancel);*/
 
         init();
     }
@@ -102,31 +86,13 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         finalBillPeopleList = new ArrayList<>();
         finalPaidPeopleList = new ArrayList<>();
 
-        etBillDate.setOnClickListener(this);
+/*        etBillDate.setOnClickListener(this);
         etBillTime.setOnClickListener(this);
         etBillPeople.setOnClickListener(this);
-        etBillPaidPeople.setOnClickListener(this);
+        etBillPaidPeople.setOnClickListener(this);*/
 
         btSave.setOnClickListener(this);
         btCancel.setOnClickListener(this);
-
-        setupDate();
-        setUpTime();
-    }
-
-    private void setupDate() {
-        Calendar calendar = Calendar.getInstance();
-
-        date[0] = calendar.get(Calendar.DAY_OF_MONTH);
-        date[1] = calendar.get(Calendar.MONTH);
-        date[2] = calendar.get(Calendar.YEAR);
-    }
-
-    private void setUpTime() {
-        Calendar calendar = Calendar.getInstance();
-
-        time[0] = calendar.get(Calendar.HOUR_OF_DAY);
-        time[1] = calendar.get(Calendar.MINUTE);
     }
 
     private boolean validation() {
@@ -138,11 +104,11 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
             isValid = false;
         }
 
-        if (Util.validateFormat(etBillDate.getText().toString())) {
+/*        if (Util.validateFormat(etBillDate.getText().toString())) {
             isValid = true;
         } else {
             isValid = false;
-        }
+        }*/
 
         if (finalPaidPeopleList.size() > 0) {
             isValid = true;
@@ -162,7 +128,7 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.et_date:
+/*            case R.id.et_date:
                 createDatePicker();
                 break;
             case R.id.et_time:
@@ -173,7 +139,7 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
                 break;
             case R.id.et_people_list:
                 showBillPeopleList();
-                break;
+                break;*/
             case R.id.bt_save:
                 if (validation()) {
                     BillData billData = createBillData();
@@ -181,7 +147,7 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
                         billAsyncConfig.insertBillData(billData);
                     } catch (ExecutionException | InterruptedException e) {
                         e.printStackTrace();
-                    }finally {
+                    } finally {
                         try {
                             peopleAsyncConfig.updatePersonData(billData);
                         } catch (ExecutionException | InterruptedException e) {
@@ -205,7 +171,7 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
 
                 updatePaidPeopleList();
 
-                etBillPaidPeople.setText(name);
+                //     etBillPaidPeople.setText(name);
                 Log.d("AddBillFragment : ", String.valueOf(finalPaidPeopleList.size()));
             }
         });
@@ -222,7 +188,7 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
                 finalBillPeopleList = billPeople;
 
                 if (!name.equals(null)) {
-                    etBillPeople.setText(name);
+                    //  etBillPeople.setText(name);
                 }
                 Log.d("AddBillFragment : ", String.valueOf(finalBillPeopleList.size()));
             }
@@ -232,7 +198,7 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     }
 
     private void updatePaidPeopleList() {
-        for (int i = 0 ; i < finalPaidPeopleList.size(); i++){
+        for (int i = 0; i < finalPaidPeopleList.size(); i++) {
             BillData.BillPeople billPeople = finalPaidPeopleList.get(i);
 
             paidPeopleList.get(i).setCheck(billPeople.isCheck());
@@ -240,56 +206,15 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void createTimePicker() {
-        TimePickerDialog pickerDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker timePicker, int i, int i1) {
-                time[0] = i;
-                time[1] = i1;
-
-                etBillTime.setText(i + ":" + i1);
-            }
-        }, time[0], time[1], true);
-
-        pickerDialog.show();
-    }
-
-    private void createDatePicker() {
-        DatePickerDialog pickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-                Log.d("AddBillFragment", "Date picker : " + i + " " + i1 + 1 + " " + i2);
-
-                date[0] = i2;
-                date[1] = i1;
-                date[2] = i;
-
-                etBillDate.setText(i2 + " " + i1 + 1 + " " + i);
-            }
-        }, date[2], date[1], date[0]);
-
-        pickerDialog.show();
-    }
-
     private BillData createBillData() {
         BillData data = new BillData();
         data.setBillName(etBillName.getText().toString());
         data.setBillAmount(Integer.parseInt(etBillAmount.getText().toString()));
-        data.setBillTime(Util.dateToMilli(createDate()));
-        data.setBillTimeString(createDate());
         data.setTripId(tripData.getId());
         data.setBillPaidPeopleList(finalPaidPeopleList);
         data.setBillPeopleList(createFinalBillPeopleList());
 
         return data;
-    }
-
-    private String createDate() {
-        if (!etBillTime.getText().toString().equals(null)) {
-            return etBillDate.getText().toString() + " " + etBillTime.getText().toString();
-        } else {
-            return etBillTime.getText().toString() + " " + "00:00";
-        }
     }
 
     private ArrayList<BillData.BillPeople> createPaidPeopleList() {

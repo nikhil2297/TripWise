@@ -1,17 +1,169 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="300dp"
-    android:layout_height="300dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
     android:background="@color/colorWhite"
     app:cardCornerRadius="20dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="300dp"
-        android:layout_height="300dp">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-        <EditText
+        <TextView
+            android:id="@+id/tv_help_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:text="Create Trip"
+            android:textAlignment="center"
+            android:background="@color/colorAccent"
+            android:textColor="@color/colorWhite"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:src="@drawable/ic_arrow_back"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_help_message"
+            app:layout_constraintEnd_toStartOf="@+id/guideline4"
+            app:layout_constraintStart_toStartOf="@+id/guideline4"
+            app:layout_constraintTop_toTopOf="@+id/tv_help_message" />
+
+        <TextView
+            android:id="@+id/tv_trip_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="TRIP NAME"
+            android:layout_marginTop="16dp"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline4"
+            app:layout_constraintTop_toBottomOf="@id/tv_help_message" />
+
+        <com.tripewise.utilites.CustomEditText
+            android:id="@+id/et_trip_name"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:boxStrokeColor="@color/colorPrimary"
+            app:etInputType="text"
+            app:layout_constraintEnd_toStartOf="@id/guideline5"
+            app:layout_constraintStart_toStartOf="@id/guideline4"
+            app:layout_constraintTop_toBottomOf="@id/tv_trip_name"
+            app:textColor="@color/colorBlack"
+            app:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_destination"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="DESTINATION"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@id/guideline5"
+            app:layout_constraintStart_toStartOf="@id/guideline4"
+            app:layout_constraintTop_toBottomOf="@id/et_trip_name" />
+
+        <com.tripewise.utilites.CustomEditText
+            android:id="@+id/et_destination"
+            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            app:boxCornerRadiusBottomEnd="10dp"
+            app:boxCornerRadiusBottomStart="10dp"
+            app:boxCornerRadiusTopEnd="10dp"
+            app:boxCornerRadiusTopStart="10dp"
+            app:etInputType="text"
+            app:layout_constraintEnd_toEndOf="@id/guideline5"
+            app:layout_constraintStart_toStartOf="@id/guideline4"
+            app:layout_constraintTop_toBottomOf="@id/tv_destination"
+            app:textColor="@color/colorBlack"
+            app:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/tv_travellers"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="TRAVELLERS"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@id/guideline5"
+            app:layout_constraintStart_toStartOf="@id/guideline4"
+            app:layout_constraintTop_toBottomOf="@id/et_destination" />
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/chip_travellers"
+            style="@style/Widget.MaterialComponents.Chip.Entry"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            app:layout_constraintEnd_toEndOf="@id/guideline5"
+            app:layout_constraintStart_toStartOf="@id/guideline4"
+            app:layout_constraintTop_toBottomOf="@id/tv_travellers">
+
+            <com.google.android.material.chip.Chip
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:text="+"
+                android:textAlignment="center"
+                android:textAppearance="@style/chipAddTextAppearance"
+                android:textColor="@color/colorBlack"
+                app:chipBackgroundColor="@color/colorWhite"
+                app:chipCornerRadius="40dp"
+                app:chipStrokeColor="@color/colorBlack"
+                app:chipStrokeWidth="0.5dp" />
+        </com.google.android.material.chip.ChipGroup>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/bt_create"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="18dp"
+            android:layout_marginEnd="18dp"
+            android:padding="10dp"
+            android:text="Create"
+            android:textSize="22sp"
+            app:cornerRadius="10dp"
+            app:layout_constraintBottom_toBottomOf="@id/guideline6"
+            app:layout_constraintEnd_toEndOf="@id/guideline5"
+            app:layout_constraintStart_toStartOf="@id/guideline4" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="21dp" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline5"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent="0.95" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline6"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="0.85" />
+
+        <!--        <EditText
             android:id="@+id/et_trip_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -87,6 +239,6 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toEndOf="@+id/bt_save" />
+            app:layout_constraintStart_toEndOf="@+id/bt_save" />-->
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

@@ -4,8 +4,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +12,7 @@ import android.widget.EditText;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
@@ -30,12 +28,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
-public class TripDialogFragment extends DialogFragment implements View.OnClickListener {
+public class TripDialogFragment extends Fragment implements View.OnClickListener {
 
     private EditText etTripName;
-    private EditText etMemberName;
+    private EditText etDestination;
 
-    private ChipGroup chipGroupMember;
+    private ChipGroup travellersChip;
 
     private ArrayList<String> memberName;
 
@@ -64,12 +62,11 @@ public class TripDialogFragment extends DialogFragment implements View.OnClickLi
 
         personData = new ArrayList<>();
 
-        setCancelable(false);
 
         etTripName = view.findViewById(R.id.et_trip_name);
-        etMemberName = view.findViewById(R.id.et_name);
+        etDestination = view.findViewById(R.id.et_destination);
 
-        chipGroupMember = view.findViewById(R.id.chip_member_group);
+        travellersChip = view.findViewById(R.id.chip_travellers);
 
         btSave = view.findViewById(R.id.bt_save);
         btCancel = view.findViewById(R.id.bt_cancel);
@@ -77,35 +74,20 @@ public class TripDialogFragment extends DialogFragment implements View.OnClickLi
         btSave.setOnClickListener(this);
         btCancel.setOnClickListener(this);
 
-        chipGroupMember.setOnHierarchyChangeListener(new ViewGroup.OnHierarchyChangeListener() {
+        travellersChip.setOnHierarchyChangeListener(new ViewGroup.OnHierarchyChangeListener() {
             @Override
             public void onChildViewAdded(View view, View view1) {
-                isMember = chipGroupMember.getChildCount() >= 2;
+                isMember = travellersChip.getChildCount() >= 2;
                 setButtonState();
             }
 
             @Override
             public void onChildViewRemoved(View view, View view1) {
-                isMember = chipGroupMember.getChildCount() >= 2;
+                isMember = travellersChip.getChildCount() >= 2;
                 setButtonState();
             }
         });
 
-        etMemberName.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                String tempText = etMemberName.getText().toString();
-                if (!tempText.equals("")) {
-                    if (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_SPACE) {
-                        chipGroupMember.addView(createChip(etMemberName.getText().toString()));
-                        Log.d("TripDIalogFragment", " Chip Count : " + chipGroupMember.getChildCount());
-                        memberName.add(etMemberName.getText().toString());
-                        etMemberName.setText("");
-                    }
-                }
-                return false;
-            }
-        });
 
         etTripName.addTextChangedListener(new TextWatcher() {
             @Override
@@ -126,11 +108,6 @@ public class TripDialogFragment extends DialogFragment implements View.OnClickLi
         });
     }
 
-    @Override
-    public int getTheme() {
-        return R.style.FullScreenDialog;
-    }
-
     private Chip createChip(String text) {
         Chip chip = new Chip(getActivity());
         chip.setText(text);
@@ -145,7 +122,7 @@ public class TripDialogFragment extends DialogFragment implements View.OnClickLi
             public void onClick(View v) {
                 Chip tempChip = (Chip) v;
                 memberName.remove(tempChip.getText().toString());
-                chipGroupMember.removeView(v);
+                travellersChip.removeView(v);
             }
         });
         return chip;
@@ -169,11 +146,9 @@ public class TripDialogFragment extends DialogFragment implements View.OnClickLi
                     }
 
                     updatePeopleData();
-                    dismissAllowingStateLoss();
                 }
                 break;
             case R.id.bt_cancel:
-                dismissAllowingStateLoss();
                 break;
         }
     }

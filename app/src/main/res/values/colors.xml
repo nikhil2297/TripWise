@@ -12,5 +12,10 @@
     <color name="colorBlack">#000</color>
     <color name="colorGreen">#32CD32</color>
     <color name="colorRed">#FF0000</color>
+    <color name="colorDarkGrey">#8C8C8C</color>
+    <color name="colorLightGrey">#BFBFBF</color>
+    <color name="colorLightGrey2">#F9F9F9</color>
+
+    <color name="colorRedTransparent">#60000000</color>
     <color name="colorTransparent">#00000000</color>
 </resources>
