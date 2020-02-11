@@ -14,10 +14,10 @@
             android:id="@+id/tv_help_message"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/colorAccent"
             android:padding="10dp"
             android:text="Create Trip"
             android:textAlignment="center"
-            android:background="@color/colorAccent"
             android:textColor="@color/colorWhite"
             android:textSize="24sp"
             android:textStyle="bold"
@@ -26,6 +26,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <ImageView
+            android:id="@+id/imageView"
             android:layout_width="30dp"
             android:layout_height="30dp"
             android:src="@drawable/ic_arrow_back"
@@ -38,8 +39,8 @@
             android:id="@+id/tv_trip_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="TRIP NAME"
             android:layout_marginTop="16dp"
+            android:text="TRIP NAME"
             android:textColor="@color/colorPrimaryDark"
             android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -105,28 +106,36 @@
             app:layout_constraintStart_toStartOf="@id/guideline4"
             app:layout_constraintTop_toBottomOf="@id/et_destination" />
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chip_travellers"
-            style="@style/Widget.MaterialComponents.Chip.Entry"
+        <HorizontalScrollView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            app:layout_constraintEnd_toEndOf="@id/guideline5"
-            app:layout_constraintStart_toStartOf="@id/guideline4"
-            app:layout_constraintTop_toBottomOf="@id/tv_travellers">
+            android:scrollbars="none"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline4"
+            app:layout_constraintTop_toBottomOf="@+id/tv_travellers">
 
-            <com.google.android.material.chip.Chip
-                android:layout_width="70dp"
-                android:layout_height="70dp"
-                android:text="+"
-                android:textAlignment="center"
-                android:textAppearance="@style/chipAddTextAppearance"
-                android:textColor="@color/colorBlack"
-                app:chipBackgroundColor="@color/colorWhite"
-                app:chipCornerRadius="40dp"
-                app:chipStrokeColor="@color/colorBlack"
-                app:chipStrokeWidth="0.5dp" />
-        </com.google.android.material.chip.ChipGroup>
+            <com.google.android.material.chip.ChipGroup
+                android:id="@+id/chip_travellers"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:scrollbars="horizontal"
+                android:splitMotionEvents="true"
+                app:singleSelection="true">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_add"
+                    style="@style/Widget.MaterialComponents.Chip.Choice"
+                    android:layout_width="60dp"
+                    android:layout_height="80dp"
+                    android:text="+"
+                    android:textAlignment="center"
+                    android:textAppearance="@style/chipAddTextAppearance"
+                    android:textColor="@color/colorBlack"
+                    app:chipBackgroundColor="@color/colorWhite"
+                    app:chipCornerRadius="80dp"
+                    app:chipStrokeWidth="0.5dp" />
+            </com.google.android.material.chip.ChipGroup>
+        </HorizontalScrollView>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/bt_create"

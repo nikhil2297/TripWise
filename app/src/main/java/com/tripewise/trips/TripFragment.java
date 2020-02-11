@@ -94,9 +94,7 @@ public class TripFragment extends Fragment implements TripsAdapter.ItemClickList
 
     @Override
     public void onClick(View view) {
-        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-        TripDialogFragment tripDialogFragment = new TripDialogFragment();
-        tripDialogFragment.show(fragmentTransaction, "adding");
+        controller.navigate(R.id.action_tripFragment_to_placeholder);
     }
 
     @Override

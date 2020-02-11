@@ -7,6 +7,7 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.text.Editable;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -40,7 +41,7 @@ public class CustomEditText extends TextInputLayout implements TextWatcher, Text
     private int minEms;
     private int gravity = Gravity.NO_GRAVITY;
     private int maxLength;
-    private int visibility = VISIBLE;
+    private int visibility = 0;
     private int breakStrategy;
     private int inputType = InputType.TYPE_CLASS_TEXT;
     private int justification;
@@ -97,6 +98,7 @@ public class CustomEditText extends TextInputLayout implements TextWatcher, Text
 
     private TextListener textListener;
     private TextEditorActionListener editorActionListener;
+    private OnTextChangeListener onTextChangeListener;
 
     public CustomEditText(@NonNull Context context) {
         this(context, null);
@@ -124,8 +126,8 @@ public class CustomEditText extends TextInputLayout implements TextWatcher, Text
         editText.setTextSize(textSize);
         editText.setHint(hint);
         editText.setGravity(gravity);
-        editText.setVisibility(visibility);
         editText.setInputType(inputType);
+        editText.setVisibility(visibility);
         editText.setMaxLines(maxLines);
         editText.setMinLines(minLines);
         editText.setLines(lines);
@@ -135,6 +137,13 @@ public class CustomEditText extends TextInputLayout implements TextWatcher, Text
         editText.setHorizontallyScrolling(scrollHorizontally);
         editText.setSingleLine(singleLine);
         editText.setEnabled(enabled);
+
+        if (maxLength != 0){
+            InputFilter[] filters = new InputFilter[1];
+            filters[0] = new InputFilter.LengthFilter(maxLength);
+
+            editText.setFilters(filters);
+        }
 
         editText.addTextChangedListener(this);
         editText.setOnEditorActionListener(this);
@@ -206,6 +215,10 @@ public class CustomEditText extends TextInputLayout implements TextWatcher, Text
 
     public void setOnEditorActionListiner(TextEditorActionListener listener) {
         this.editorActionListener = listener;
+    }
+
+    public void addOnTextChangeListener(OnTextChangeListener onTextChangeListener){
+        this.onTextChangeListener = onTextChangeListener;
     }
 
     public String getText() {
@@ -571,17 +584,27 @@ public class CustomEditText extends TextInputLayout implements TextWatcher, Text
 
     @Override
     public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        textListener.beforeTextChanged(s, start, count, after);
+        if (textListener != null) {
+            textListener.beforeTextChanged(s, start, count, after);
+        }
     }
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
-        textListener.onTextChanged(s, start, before, count);
+        if (textListener != null) {
+            textListener.onTextChanged(s, start, before, count);
+        }
+
+        if (onTextChangeListener != null){
+            onTextChangeListener.onTextChange(s, start, before, count);
+        }
     }
 
     @Override
     public void afterTextChanged(Editable s) {
-        textListener.afterTextChanged(s);
+        if (textListener != null) {
+            textListener.afterTextChanged(s);
+        }
     }
 
     @Override
@@ -602,5 +625,9 @@ public class CustomEditText extends TextInputLayout implements TextWatcher, Text
     public interface TextEditorActionListener {
 
         boolean onEditorAction(TextView v, int actionId, KeyEvent event);
+    }
+
+    public interface OnTextChangeListener {
+        void onTextChange(CharSequence s, int start, int before, int count);
     }
 }

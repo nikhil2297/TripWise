@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey;
 
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class PersonData {
@@ -15,6 +15,12 @@ public class PersonData {
 
     @ColumnInfo(name = "person_name")
     private String personName;
+
+    @ColumnInfo(name = "person_mobile_number")
+    private String mobileNumber;
+
+    @ColumnInfo(name = "person_icon_color")
+    private int personColor;
 
     @ColumnInfo(name = "total_amount_paid")
     private long totalAmountPaid;
@@ -45,6 +51,22 @@ public class PersonData {
 
     public void setPersonName(String personName) {
         this.personName = personName;
+    }
+
+    public String getMobileNumber() {
+        return mobileNumber;
+    }
+
+    public void setMobileNumber(String mobileNumber) {
+        this.mobileNumber = mobileNumber;
+    }
+
+    public int getPersonColor() {
+        return personColor;
+    }
+
+    public void setPersonColor(int personColor) {
+        this.personColor = personColor;
     }
 
     public long getTotalAmountPaid() {
@@ -92,7 +114,15 @@ public class PersonData {
         return new Gson().fromJson(paymentDetails, PaymentDetailsData.class);
     }
 
-    public void setPaymentData(PaymentDetailsData data){
+    public void setPaymentData(PaymentDetailsData data) {
         setPaymentDetails(new Gson().toJson(data).toString());
+    }
+
+    public void removePerson(List<PersonData> personData, String mobileNumber){
+        for (PersonData data : personData){
+            if (data.getMobileNumber().equals(mobileNumber)){
+                personData.remove(data);
+            }
+        }
     }
 }

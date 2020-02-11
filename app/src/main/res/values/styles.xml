@@ -19,7 +19,7 @@
     </style>
 
     <style name="chipAddTextAppearance" parent="TextAppearance.MaterialComponents.Chip">
-        <item name="android:textSize">54sp</item>
+        <item name="android:textSize">50sp</item>
     </style>
 
     <style name="chipTextAppearance" parent="TextAppearance.MaterialComponents.Chip">
