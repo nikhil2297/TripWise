@@ -1,26 +1,38 @@
 package com.tripewise.bills;
 
+import android.app.Dialog;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.chip.ChipGroup;
 import com.google.gson.Gson;
 import com.tripewise.R;
 import com.tripewise.utilites.CustomEditText;
 import com.tripewise.utilites.storage.data.BillData;
+import com.tripewise.utilites.storage.data.PersonData;
 import com.tripewise.utilites.storage.data.TripData;
 import com.tripewise.utilites.storage.tasks.BillAsyncConfig;
 import com.tripewise.utilites.storage.tasks.PeopleAsyncConfig;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class AddBillFragment extends Fragment implements View.OnClickListener {
@@ -29,8 +41,16 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     private CustomEditText etBillName;
     private CustomEditText etBillAmount;
 
-    private Button btSave;
-    private Button btCancel;
+    private MaterialButton btCreate;
+
+    private ChipGroup billPayerChip;
+    private ChipGroup billPeopleChip;
+
+    private ImageView ivBack;
+
+    private NavController controller;
+
+    private List<PersonData> personDataList;
 
     private ArrayList<BillData.BillPeople> billPeopleList;
     private ArrayList<BillData.BillPeople> paidPeopleList;
@@ -41,11 +61,6 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     private PeopleAsyncConfig peopleAsyncConfig;
 
     private BillAsyncConfig billAsyncConfig;
-
-    private boolean isBillName;
-    private boolean isBillDate;
-    private boolean isBillPaidPeople;
-    private boolean isBillAmount;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -65,15 +80,17 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        controller = NavHostFragment.findNavController(this);
+
         etBillName = view.findViewById(R.id.et_bill_name);
         etBillAmount = view.findViewById(R.id.et_amount);
-/*        etBillDate = view.findViewById(R.id.et_date);
-        etBillTime = view.findViewById(R.id.et_time);
-        etBillPaidPeople = view.findViewById(R.id.et_paid_people);
-        etBillPeople = view.findViewById(R.id.et_people_list);
 
-        btSave = view.findViewById(R.id.bt_save);
-        btCancel = view.findViewById(R.id.bt_cancel);*/
+        btCreate = view.findViewById(R.id.bt_create);
+
+        billPayerChip = view.findViewById(R.id.chip_bill_payer);
+        billPeopleChip = view.findViewById(R.id.chip_bill_people);
+
+        ivBack = view.findViewById(R.id.iv_back);
 
         init();
     }
@@ -86,61 +103,46 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         finalBillPeopleList = new ArrayList<>();
         finalPaidPeopleList = new ArrayList<>();
 
-/*        etBillDate.setOnClickListener(this);
-        etBillTime.setOnClickListener(this);
-        etBillPeople.setOnClickListener(this);
-        etBillPaidPeople.setOnClickListener(this);*/
+        billPeopleList = new ArrayList<>();
+        paidPeopleList = new ArrayList<>();
 
-        btSave.setOnClickListener(this);
-        btCancel.setOnClickListener(this);
+        btCreate.setOnClickListener(this);
+        ivBack.setOnClickListener(this);
+
+        createPaidPeople();
+    }
+
+    private void createPaidPeople() {
+        peopleAsyncConfig.getPersonData(tripData.getId()).observe(getViewLifecycleOwner(), new Observer<List<PersonData>>() {
+            @Override
+            public void onChanged(List<PersonData> personData) {
+                personDataList = personData;
+
+                for (PersonData data : personData) {
+                    billPayerChip.addView(createPaidPeopleView(billPayerChip, data));
+
+                    billPeopleChip.addView(createBillPeopleView(billPeopleChip, data));
+
+                    setBillPeople(false, data);
+                }
+            }
+        });
     }
 
     private boolean validation() {
-        boolean isValid = false;
+        boolean isBillName = etBillName.getText().toString().length() > 1;
 
-        if (etBillName.getText().toString().length() > 1) {
-            isValid = true;
-        } else {
-            isValid = false;
-        }
+        boolean isBillPaidPeople = finalPaidPeopleList.size() > 0;
 
-/*        if (Util.validateFormat(etBillDate.getText().toString())) {
-            isValid = true;
-        } else {
-            isValid = false;
-        }*/
+        boolean isBillAmount = etBillAmount.getText().toString().length() > 1;
 
-        if (finalPaidPeopleList.size() > 0) {
-            isValid = true;
-        } else {
-            isValid = false;
-        }
-
-        if (etBillAmount.getText().toString().length() > 1) {
-            isValid = true;
-        } else {
-            isValid = false;
-        }
-
-        return isValid;
+        return isBillAmount && isBillName && isBillPaidPeople;
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-/*            case R.id.et_date:
-                createDatePicker();
-                break;
-            case R.id.et_time:
-                createTimePicker();
-                break;
-            case R.id.et_paid_people:
-                showPaidPeopleList();
-                break;
-            case R.id.et_people_list:
-                showBillPeopleList();
-                break;*/
-            case R.id.bt_save:
+            case R.id.bt_create:
                 if (validation()) {
                     BillData billData = createBillData();
                     try {
@@ -149,95 +151,195 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
                         e.printStackTrace();
                     } finally {
                         try {
-                            peopleAsyncConfig.updatePersonData(billData);
+                            peopleAsyncConfig.updatePersonData(billData, personDataList);
                         } catch (ExecutionException | InterruptedException e) {
                             e.printStackTrace();
                         }
                     }
                 }
                 break;
-            case R.id.bt_cancel:
+            case R.id.iv_back:
+                controller.popBackStack();
                 break;
         }
     }
 
-    private void showPaidPeopleList() {
-        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+    private View createPaidPeopleView(ChipGroup chipGroup, final PersonData data) {
+        final View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout_trip_chip, (ViewGroup) chipGroup.getParent(), false);
 
-        PeopleListDialogFragment dialogFragment = PeopleListDialogFragment.newInstance(createPaidPeopleList(), true, new PeopleListDialogFragment.PeopleListListener() {
+        final ConstraintLayout layoutChip = view.findViewById(R.id.layout_chip);
+
+        final MaterialCardView chipCardView = view.findViewById(R.id.materialCardView);
+
+        final TextView tvName = layoutChip.findViewById(R.id.tv_chip_name);
+
+        TextView tvFullName = layoutChip.findViewById(R.id.tv_chip_full_name);
+
+        tvFullName.setText(data.getPersonName());
+        tvName.setText(data.getPersonName().substring(0, 2).toUpperCase());
+        tvName.setTextColor(Color.BLACK);
+
+        setUnCheckChip(chipCardView, data);
+
+        layoutChip.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onBillDataChange(ArrayList<BillData.BillPeople> billPeople, String name) {
-                finalPaidPeopleList = billPeople;
+            public void onClick(View v) {
+                if (chipCardView.getCardBackgroundColor().getDefaultColor() == Color.WHITE) {
+                    createAmountPopUp(chipCardView, data, tvName);
+                } else {
+                    setUnCheckChip(chipCardView, data);
 
-                updatePaidPeopleList();
+                    setPaidBillPeople(true, 0, data);
 
-                //     etBillPaidPeople.setText(name);
-                Log.d("AddBillFragment : ", String.valueOf(finalPaidPeopleList.size()));
-            }
-        });
-
-        dialogFragment.show(fragmentTransaction, "paid-people-list");
-    }
-
-    private void showBillPeopleList() {
-        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-
-        PeopleListDialogFragment dialogFragment = PeopleListDialogFragment.newInstance(createBillPeopleList(), false, new PeopleListDialogFragment.PeopleListListener() {
-            @Override
-            public void onBillDataChange(ArrayList<BillData.BillPeople> billPeople, String name) {
-                finalBillPeopleList = billPeople;
-
-                if (!name.equals(null)) {
-                    //  etBillPeople.setText(name);
+                    tvName.setTextColor(Color.BLACK);
                 }
-                Log.d("AddBillFragment : ", String.valueOf(finalBillPeopleList.size()));
             }
         });
 
-        dialogFragment.show(fragmentTransaction, "bill-people-list");
+        return view;
     }
 
-    private void updatePaidPeopleList() {
-        for (int i = 0; i < finalPaidPeopleList.size(); i++) {
-            BillData.BillPeople billPeople = finalPaidPeopleList.get(i);
+    private View createBillPeopleView(ChipGroup chipGroup, final PersonData data) {
+        final View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout_trip_chip, (ViewGroup) chipGroup.getParent(), false);
 
-            paidPeopleList.get(i).setCheck(billPeople.isCheck());
-            paidPeopleList.get(i).setAmount(billPeople.getAmount());
+        final ConstraintLayout layoutChip = view.findViewById(R.id.layout_chip);
+
+        final MaterialCardView chipCardView = view.findViewById(R.id.materialCardView);
+
+        final TextView tvName = layoutChip.findViewById(R.id.tv_chip_name);
+
+        TextView tvFullName = layoutChip.findViewById(R.id.tv_chip_full_name);
+
+        tvFullName.setText(data.getPersonName());
+        tvFullName.setVisibility(View.VISIBLE);
+        tvName.setText(data.getPersonName().substring(0, 2).toUpperCase());
+
+        setCheckedChip(chipCardView, data);
+
+        layoutChip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (chipCardView.getCardBackgroundColor().getDefaultColor() == Color.WHITE) {
+                    setCheckedChip(chipCardView, data);
+                    tvName.setTextColor(Color.WHITE);
+
+                    setBillPeople(false, data);
+                } else {
+                    setUnCheckChip(chipCardView, data);
+                    tvName.setTextColor(Color.BLACK);
+
+                    setBillPeople(true, data);
+                }
+            }
+        });
+
+        return view;
+    }
+
+    private void setBillPeople(boolean isRemove, PersonData data) {
+        if (!isRemove) {
+            BillData.BillPeople people = new BillData.BillPeople();
+            people.setPeopleName(data.getPersonName());
+            people.setPeopleNumber(data.getMobileNumber());
+
+            billPeopleList.add(people);
+        } else {
+            Iterator<BillData.BillPeople> iterator = billPeopleList.listIterator();
+            while (iterator.hasNext()) {
+                if (iterator.next().getPeopleNumber().equals(data.getMobileNumber())) {
+                    iterator.remove();
+                }
+            }
         }
+
+        finalBillPeopleList = billPeopleList;
+
+        Log.d("AddBillFragment", "Bill People List size : " + billPeopleList.size());
+    }
+
+    private void setPaidBillPeople(boolean isRemove, long amount, PersonData data) {
+        if (!isRemove) {
+            BillData.BillPeople people = new BillData.BillPeople();
+            people.setAmount(amount);
+            people.setPeopleNumber(data.getMobileNumber());
+            people.setPeopleName(data.getPersonName());
+
+            paidPeopleList.add(people);
+        } else {
+            Iterator<BillData.BillPeople> iterator = paidPeopleList.listIterator();
+            while (iterator.hasNext()) {
+                if (iterator.next().getPeopleNumber().equals(data.getMobileNumber())) {
+                    iterator.remove();
+                }
+            }
+        }
+
+        finalPaidPeopleList = paidPeopleList;
+    }
+
+    private void createAmountPopUp(final MaterialCardView cardView, final PersonData personData, final TextView tvName) {
+        final Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.layout_bill_amount_dialog);
+
+        final MaterialCardView chipCardView = dialog.findViewById(R.id.materialCardView);
+
+        TextView tvChipName = dialog.findViewById(R.id.tv_chip_name);
+
+        final CustomEditText etAmount = dialog.findViewById(R.id.tv_amount_paid);
+        CustomEditText etName = dialog.findViewById(R.id.et_traveller_name);
+
+        final MaterialButton btSave = dialog.findViewById(R.id.bt_save);
+
+        tvChipName.setText(personData.getPersonName().substring(0, 2).toUpperCase());
+
+        etName.setText(personData.getPersonName());
+
+        chipCardView.setCardBackgroundColor(personData.getPersonColor());
+
+        etAmount.addOnTextChangeListener(new CustomEditText.OnTextChangeListener() {
+            @Override
+            public void onTextChange(CharSequence s, int start, int before, int count) {
+                btSave.setEnabled(s.length() > 0);
+            }
+        });
+
+        btSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setPaidBillPeople(false, Long.parseLong(etAmount.getText()), personData);
+
+                setCheckedChip(cardView, personData);
+
+                tvName.setTextColor(Color.WHITE);
+
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+    }
+
+    private void setCheckedChip(MaterialCardView checkedChip, PersonData data) {
+        checkedChip.setCardBackgroundColor(data.getPersonColor());
+        checkedChip.setStrokeWidth(0);
+        checkedChip.setStrokeColor(Color.TRANSPARENT);
+    }
+
+    private void setUnCheckChip(MaterialCardView unChekChip, PersonData data) {
+        unChekChip.setCardBackgroundColor(Color.WHITE);
+        unChekChip.setStrokeWidth(1);
+        unChekChip.setStrokeColor(Color.BLACK);
     }
 
     private BillData createBillData() {
         BillData data = new BillData();
         data.setBillName(etBillName.getText().toString());
-        data.setBillAmount(Integer.parseInt(etBillAmount.getText().toString()));
+        data.setBillAmount(Long.parseLong(etBillAmount.getText().toString()));
         data.setTripId(tripData.getId());
         data.setBillPaidPeopleList(finalPaidPeopleList);
-        data.setBillPeopleList(createFinalBillPeopleList());
+        data.setBillPeopleList(sortBillPeople(finalBillPeopleList));
 
         return data;
-    }
-
-    private ArrayList<BillData.BillPeople> createPaidPeopleList() {
-        if (paidPeopleList == null) {
-            paidPeopleList = new ArrayList<>();
-
-            for (int i = 0; i < tripData.getMemberName().size(); i++) {
-                BillData.BillPeople people = new BillData.BillPeople();
-                people.setPeopleName(tripData.getMemberName().get(i));
-
-                paidPeopleList.add(people);
-            }
-        }
-
-        return paidPeopleList;
-    }
-
-    private ArrayList<BillData.BillPeople> createFinalBillPeopleList() {
-        if (finalBillPeopleList.size() > 0) {
-            return sortBillPeople(finalBillPeopleList);
-        } else {
-            return sortBillPeople(createBillPeopleList());
-        }
     }
 
     private ArrayList<BillData.BillPeople> sortBillPeople(ArrayList<BillData.BillPeople> newBillPeopleList) {
@@ -252,20 +354,5 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
             }
         }
         return newBillPeopleList;
-    }
-
-    private ArrayList<BillData.BillPeople> createBillPeopleList() {
-        if (billPeopleList == null) {
-            billPeopleList = new ArrayList<>();
-
-            for (int i = 0; i < tripData.getMemberName().size(); i++) {
-                BillData.BillPeople people = new BillData.BillPeople();
-                people.setPeopleName(tripData.getMemberName().get(i));
-
-                billPeopleList.add(people);
-            }
-        }
-
-        return billPeopleList;
     }
 }

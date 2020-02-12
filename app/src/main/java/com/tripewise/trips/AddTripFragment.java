@@ -169,7 +169,7 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
         }
 
         try {
-            new PeopleAsyncConfig(getActivity(), 0).insertPersonDetails(personData);
+            new PeopleAsyncConfig(getActivity()).insertPersonDetails(personData);
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
         } finally {

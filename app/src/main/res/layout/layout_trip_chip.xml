@@ -37,4 +37,15 @@
         android:src="@drawable/ic_cancel_cricle"
         app:layout_constraintEnd_toEndOf="@+id/materialCardView"
         app:layout_constraintTop_toTopOf="@+id/materialCardView" />
+
+    <TextView
+        android:id="@+id/tv_chip_full_name"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:textColor="@color/colorBlack"
+        android:textSize="16sp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/materialCardView"
+        app:layout_constraintStart_toStartOf="@id/materialCardView"
+        app:layout_constraintEnd_toEndOf="@id/materialCardView"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

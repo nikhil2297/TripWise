@@ -5,6 +5,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Observer;
 
 import com.google.gson.Gson;
@@ -13,6 +16,7 @@ import com.tripewise.utilites.storage.data.BillData;
 import com.tripewise.utilites.storage.data.PersonData;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 
 public class PeopleAsyncConfig {
@@ -20,27 +24,28 @@ public class PeopleAsyncConfig {
 
     private Context context;
 
-    private List<PersonData> personDataList;
-
-    public PeopleAsyncConfig(Context context, int tripId) {
+    public PeopleAsyncConfig(Context context) {
         this.context = context;
 
         if (storage == null) {
             storage = TripStorage.getDataBaseInstance(context);
         }
-
-        getPersonData(tripId);
     }
 
-    private void getPersonData(int tripId) {
-        storage.personDao().getAllData(tripId).observe((LifecycleOwner) context, new Observer<List<PersonData>>() {
+    public LiveData<List<PersonData>> getPersonData(int tripId) {
+
+       /* storage.personDao().getAllData(tripId).observe((LifecycleOwner) context, new Observer<List<PersonData>>() {
             @Override
             public void onChanged(List<PersonData> personData) {
                 personDataList = personData;
 
+                personDataMutableLiveData.setValue(personData);
+
                 Log.d("PeopleAsyncConfig : ", "Person Data = " + new Gson().toJson(personData).toString());
             }
-        });
+        });*/
+
+       return storage.personDao().getAllData(tripId);
     }
 
     public void insertPersonDetails(List<PersonData> data) throws ExecutionException, InterruptedException {
@@ -82,7 +87,7 @@ public class PeopleAsyncConfig {
         }
     }
 
-    public void updatePersonData(BillData billData) throws ExecutionException, InterruptedException {
+    public void updatePersonData(BillData billData, List<PersonData> personDataList) throws ExecutionException, InterruptedException {
         PersonUtils personUtils = new PersonUtils(billData, personDataList);
 
         for (PersonData personData : personUtils.initPersonData()) {
@@ -105,7 +110,7 @@ public class PeopleAsyncConfig {
         }
     }
 
-    public List<PersonData> getCalculatedPersonResult() {
+    public List<PersonData> getCalculatedPersonResult(List<PersonData> personDataList) {
         PersonUtils personUtils = new PersonUtils(null, personDataList);
 
         return personUtils.finalCalculation();
