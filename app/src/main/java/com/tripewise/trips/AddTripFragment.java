@@ -13,6 +13,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
@@ -41,13 +43,27 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
 
     private List<PersonData> personData;
 
+    private NavController controller;
+
     private Button btSave;
     private Button btCancel;
+
+    private int latestTripId;
 
     private boolean isMember;
     private boolean isTripName;
 
+    private ImageView ivBack;
+
     private TripAsyncConfig asyncConfig;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        AddTripFragmentArgs args = AddTripFragmentArgs.fromBundle(getArguments());
+        latestTripId = args.getLatestId();
+    }
 
     @Nullable
     @Override
@@ -58,11 +74,14 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        controller = NavHostFragment.findNavController(this);
 
         etTripName = view.findViewById(R.id.et_trip_name);
         etDestination = view.findViewById(R.id.et_destination);
 
         travellersChip = view.findViewById(R.id.chip_travellers);
+
+        ivBack = view.findViewById(R.id.iv_back);
 
         btSave = view.findViewById(R.id.bt_create);
 
@@ -96,13 +115,17 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
             public void onTextChange(CharSequence s, int start, int before, int count) {
                 if (s.length() > 2) {
                     isTripName = true;
+                    setButtonState();
                 } else {
                     isTripName = false;
+                    setButtonState();
                 }
             }
         });
 
         btSave.setOnClickListener(this);
+        ivBack.setOnClickListener(this);
+
         travellersChip.setOnCheckedChangeListener(this);
     }
 
@@ -126,6 +149,9 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
                     updatePeopleData();
                 }
                 break;
+            case R.id.iv_back:
+                controller.popBackStack(R.id.tripFragment, false);
+                break;
         }
     }
 
@@ -138,37 +164,21 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
     }
 
     private void updatePeopleData() {
-        ArrayList<PaymentDetailsData.Details> details = new ArrayList<>();
-
         for (int i = 0; i < personData.size(); i++) {
             createPeopleData(personData.get(i), i);
         }
 
         try {
-            new PeopleAsyncConfig(getActivity()).insertPersonDetails(personData);
+            new PeopleAsyncConfig(getActivity(), 0).insertPersonDetails(personData);
         } catch (ExecutionException | InterruptedException e) {
             e.printStackTrace();
+        } finally {
+            controller.popBackStack();
         }
     }
 
     private void createPeopleData(PersonData mainData, int position) {
         PaymentDetailsData detailsData = new PaymentDetailsData();
-
-        /*PersonData data = new PersonData();
-        data.setPersonName(name);
-
-        for (String s : memberName) {
-            if (!s.equals(name)) {
-                PaymentDetailsData.Details details = new PaymentDetailsData.Details();
-
-                details.setName(s);
-
-                detailsData.setReceiveData(details);
-                detailsData.setSendData(details);
-
-                data.setPaymentData(detailsData);
-            }
-        }*/
 
         for (PersonData data1 : personData) {
             if (!data1.getPersonName().equals(mainData.getPersonName())) {
@@ -185,6 +195,14 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
         }
 
         personData.set(position, mainData);
+    }
+
+    @Override
+    public void onCheckedChanged(ChipGroup chipGroup, int i) {
+        if (i == R.id.chip_add) {
+            createTravellerDialog();
+            chipGroup.clearCheck();
+        }
     }
 
     private View createView(final PersonData data) {
@@ -236,14 +254,6 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
         return view;
     }
 
-    @Override
-    public void onCheckedChanged(ChipGroup chipGroup, int i) {
-        if (i == R.id.chip_add) {
-            createTravellerDialog();
-            chipGroup.clearCheck();
-        }
-    }
-
     private void createTravellerDialog() {
         final Dialog builder = new Dialog(getActivity());
 
@@ -258,11 +268,30 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
         etTravellerName.addOnTextChangeListener(new CustomEditText.OnTextChangeListener() {
             @Override
             public void onTextChange(CharSequence s, int start, int before, int count) {
-                if (s.length() > 2) {
-                    btCreate.setEnabled(true);
-                } else {
-                    btCreate.setEnabled(false);
+                boolean status = buttonCreateEnable(s.length() > 2, etTravellerNumber.getText().length() == 10);
+
+                btCreate.setEnabled(status);
+            }
+        });
+
+        etTravellerNumber.addOnTextChangeListener(new CustomEditText.OnTextChangeListener() {
+            @Override
+            public void onTextChange(CharSequence s, int start, int before, int count) {
+                boolean status = buttonCreateEnable(etTravellerName.getText().length() > 2, s.length() == 10);
+
+                if (s.length() == 10) {
+                    status = isPersonValid(s.toString());
+
+                    if (!status) {
+                        etTravellerNumber.setErrorEnabled(true);
+                        etTravellerNumber.setError("Same mobile number cannot be used");
+                    } else {
+                        etTravellerNumber.setErrorEnabled(false);
+                        etTravellerNumber.setError("");
+                    }
                 }
+
+                btCreate.setEnabled(status);
             }
         });
 
@@ -274,6 +303,7 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
                 PersonData data = new PersonData();
                 data.setPersonName(etTravellerName.getText());
                 data.setMobileNumber(etTravellerNumber.getText());
+                data.setTripId(latestTripId + 1);
 
                 personData.add(data);
 
@@ -284,5 +314,19 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
         });
 
         builder.show();
+    }
+
+    private boolean buttonCreateEnable(boolean isName, boolean isNumber) {
+        return isName && isNumber;
+    }
+
+    private boolean isPersonValid(String mobileNumber) {
+        for (PersonData data : personData) {
+            if (data.getMobileNumber().equals(mobileNumber)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

@@ -13,10 +13,14 @@
         <action
             android:id="@+id/action_tripFragment_to_billsFragment"
             app:destination="@id/billsFragment"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit"
             app:popUpTo="@+id/tripFragment" />
         <action
             android:id="@+id/action_tripFragment_to_placeholder"
             app:destination="@id/placeholder"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:popEnterAnim="@anim/fragment_fade_exit"
             app:popUpTo="@+id/tripFragment" />
     </fragment>
     <fragment
@@ -30,6 +34,8 @@
         <action
             android:id="@+id/action_billsFragment_to_addBillFragment"
             app:destination="@id/addBillFragment"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit"
             app:popUpTo="@+id/billsFragment" />
     </fragment>
     <fragment
@@ -49,5 +55,11 @@
     <fragment
         android:id="@+id/placeholder"
         android:name="com.tripewise.trips.AddTripFragment"
-        tools:layout="@layout/fragment_add_trip" />
+        tools:layout="@layout/fragment_add_trip">
+
+        <argument
+            android:name="latest_id"
+            app:argType="integer"/>
+
+    </fragment>
 </navigation>

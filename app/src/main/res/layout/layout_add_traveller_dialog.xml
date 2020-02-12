@@ -37,14 +37,15 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
+        app:errorEnabled="true"
+        app:errorTextColor="@color/colorRed"
         android:hint="Mobile Number"
         app:etInputType="number"
         app:layout_constraintEnd_toStartOf="@+id/guideline9"
         app:layout_constraintStart_toStartOf="@+id/guideline8"
         app:layout_constraintTop_toBottomOf="@id/et_traveller_name"
         app:maxLength="10"
-        app:textSize="22sp"
-        app:visibilty="gone" />
+        app:textSize="22sp" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/bt_create"

@@ -10,7 +10,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -31,7 +30,11 @@ public class TripFragment extends Fragment implements TripsAdapter.ItemClickList
 
     private TripsAdapter adapter;
 
+    private int latestTripId;
+
     private TextView tvHelpText;
+
+    private boolean fromBackPressed;
 
     private NavController controller;
 
@@ -67,26 +70,34 @@ public class TripFragment extends Fragment implements TripsAdapter.ItemClickList
         asyncConfig.onTripDataChange(new TripAsyncConfig.TripConfigListener() {
             @Override
             public void onDataChange(List<TripData> tripData) {
-                if (adapter != null) {
-                    int size = tripDataList.size();
+                if (tripData != null && tripData.size() > 0) {
+                    if (adapter != null && !fromBackPressed) {
+                        int size = tripDataList.size();
 
-                    for (int i = size; i < tripData.size(); i++) {
-                        tripDataList.add(tripData.get(i));
+                        for (int i = size; i < tripData.size(); i++) {
+                            tripDataList.add(tripData.get(i));
+                        }
+
+                        adapter.notifyDataSetChanged();
+                    } else {
+                        fromBackPressed = false;
+
+                        tripDataList = tripData;
+                        adapter = new TripsAdapter(getActivity(), tripDataList);
+                        exlvTrips.setAdapter(adapter);
+
+                        adapter.setOnItemClickListener(TripFragment.this);
+
+                        adapter.notifyDataSetChanged();
                     }
 
-                    adapter.notifyDataSetChanged();
-                } else {
-                    tripDataList = tripData;
-                    adapter = new TripsAdapter(getActivity(), tripDataList);
-                    exlvTrips.setAdapter(adapter);
+                    if (tripData.size() > 0) {
+                        tvHelpText.setVisibility(View.GONE);
+                    } else {
+                        tvHelpText.setVisibility(View.VISIBLE);
+                    }
 
-                    adapter.setOnItemClickListener(TripFragment.this);
-                }
-
-                if (tripData.size() > 0) {
-                    tvHelpText.setVisibility(View.GONE);
-                } else {
-                    tvHelpText.setVisibility(View.VISIBLE);
+                    latestTripId = tripData.get(tripData.size() - 1).getId();
                 }
             }
         });
@@ -94,12 +105,19 @@ public class TripFragment extends Fragment implements TripsAdapter.ItemClickList
 
     @Override
     public void onClick(View view) {
-        controller.navigate(R.id.action_tripFragment_to_placeholder);
+        fromBackPressed = true;
+
+        TripFragmentDirections.ActionTripFragmentToPlaceholder direction = TripFragmentDirections.actionTripFragmentToPlaceholder(latestTripId);
+        controller.navigate(direction);
     }
 
     @Override
     public void onBillClick(TripData tripData) {
-        TripFragmentDirections.ActionTripFragmentToBillsFragment direction = TripFragmentDirections.actionTripFragmentToBillsFragment(new Gson().toJson(tripData).toString());
+        fromBackPressed = true;
+
+        TripFragmentDirections.ActionTripFragmentToBillsFragment direction = TripFragmentDirections.
+                actionTripFragmentToBillsFragment(new Gson().toJson(tripData).toString());
+
         controller.navigate(direction);
     }
 

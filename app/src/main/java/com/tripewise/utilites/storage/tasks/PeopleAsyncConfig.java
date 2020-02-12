@@ -22,18 +22,18 @@ public class PeopleAsyncConfig {
 
     private List<PersonData> personDataList;
 
-    public PeopleAsyncConfig(Context context) {
+    public PeopleAsyncConfig(Context context, int tripId) {
         this.context = context;
 
         if (storage == null) {
             storage = TripStorage.getDataBaseInstance(context);
         }
 
-        getPersonData();
+        getPersonData(tripId);
     }
 
-    private void getPersonData() {
-        storage.personDao().getAllData().observe((LifecycleOwner) context, new Observer<List<PersonData>>() {
+    private void getPersonData(int tripId) {
+        storage.personDao().getAllData(tripId).observe((LifecycleOwner) context, new Observer<List<PersonData>>() {
             @Override
             public void onChanged(List<PersonData> personData) {
                 personDataList = personData;

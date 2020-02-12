@@ -43,6 +43,9 @@ public class BillData {
         @ColumnInfo(name = "bill_people_amount")
         private long amount;
 
+        @ColumnInfo(name = "bill_people_number")
+        private String peopleNumber;
+
         private boolean isCheck;
 
         public String getPeopleName() {
@@ -59,6 +62,14 @@ public class BillData {
 
         public void setAmount(long amount) {
             this.amount = amount;
+        }
+
+        public String getPeopleNumber() {
+            return peopleNumber;
+        }
+
+        public void setPeopleNumber(String peopleNumber) {
+            this.peopleNumber = peopleNumber;
         }
 
         public boolean isCheck() {

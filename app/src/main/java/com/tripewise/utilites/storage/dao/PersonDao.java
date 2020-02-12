@@ -13,12 +13,12 @@ import java.util.List;
 
 @Dao
 public interface PersonDao {
-    @Query("Select * from PersonData")
-    LiveData<List<PersonData>> getAllData();
+    @Query("Select * from PersonData Where trip_id = :tripId")
+    LiveData<List<PersonData>> getAllData(int tripId);
 
     @Update
     int updatePersonData(PersonData data);
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     long insertPersondata(PersonData data);
 }
