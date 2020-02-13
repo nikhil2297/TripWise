@@ -71,6 +71,8 @@ public class PeopleFragment extends Fragment {
         DividerItemDecoration itemDecoration = new DividerItemDecoration(rvPeople.getContext(), DividerItemDecoration.VERTICAL);
         itemDecoration.setDrawable(getResources().getDrawable(R.drawable.recycler_view_divider));
 
+        rvPeople.addItemDecoration(itemDecoration);
+
         peopleConfig = new PeopleAsyncConfig(getActivity());
 
         createPeopleList();

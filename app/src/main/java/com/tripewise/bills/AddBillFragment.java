@@ -421,4 +421,6 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         }
         return newBillPeopleList;
     }
+
+
 }

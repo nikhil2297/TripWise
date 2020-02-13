@@ -1,5 +1,7 @@
 package com.tripewise.utilites.storage.tasks;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 import com.tripewise.utilites.storage.data.BillData;
 import com.tripewise.utilites.storage.data.PaymentDetailsData;
@@ -28,6 +30,12 @@ public class PersonUtils {
 
         for (PersonData data : personData) {
             sortSendDetails(data);
+        }
+
+        for (PersonData data : personData) {
+            getTotalPayingAmount(data);
+
+            getTotalReceivingAmount(data);
         }
 
         return personData;
@@ -78,8 +86,6 @@ public class PersonUtils {
                         details.setAmount(details.getAmount() + (billData.getBillPaidPeopleList().get(i).getAmount() / billData.getBillPeopleList().size()));
                         details.setName(details.getName());
 
-                        data.setReceivingAmount(data.getReceivingAmount() + details.getAmount());
-
                         detailsArrayList.set(j, details);
                     }
                 }
@@ -112,8 +118,6 @@ public class PersonUtils {
                             details.setAmount(details.getAmount());
                         }
 
-                        data.setPayingAmount(data.getPayingAmount() + details.getAmount());
-
                         detailsArrayList.set(i, details);
                     }
                 }
@@ -122,6 +126,34 @@ public class PersonUtils {
             paymentDetailsData.setSendDetails(detailsArrayList);
 
             data.setPaymentData(paymentDetailsData);
+        }
+    }
+
+    private void getTotalReceivingAmount(PersonData data){
+        if (data != null){
+            data.setReceivingAmount(0);
+
+            PaymentDetailsData paymentData = data.getPaymentData();
+
+            for (PaymentDetailsData.Details details : paymentData.getReceiveDetails()) {
+                data.setReceivingAmount(data.getReceivingAmount() + details.getAmount());
+            }
+
+            Log.d("PersonUitls", "Name : " + data.getPersonName() + " Total Receving amount : " + data.getReceivingAmount());
+        }
+    }
+
+    private void getTotalPayingAmount(PersonData data){
+        if (data != null){
+            data.setPayingAmount(0);
+
+            PaymentDetailsData paymentData = data.getPaymentData();
+
+            for (PaymentDetailsData.Details details : paymentData.getSendDetails()) {
+                data.setPayingAmount(data.getPayingAmount() + details.getAmount());
+            }
+
+            Log.d("PersonUitls", "Name : " + data.getPersonName() + " Total Paying amount : " + data.getPayingAmount());
         }
     }
 
