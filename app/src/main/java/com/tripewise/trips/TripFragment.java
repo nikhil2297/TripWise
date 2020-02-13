@@ -64,6 +64,18 @@ public class TripFragment extends Fragment implements TripsAdapter.ItemClickList
         getTripData();
     }
 
+    /**
+     * We get list of trips from this method
+     * 1. We check for null condition and list size should be > 0 for tripData
+     * 2. We check for null condition for adapter and check if fromBackPressed is false or true
+     * 3. If adapter is null then we create a new instance of it
+     * 4  If adapter not null then we update the listView with extra data.
+     * 5. If fromBackPressed is true then we create a new instance of adapter
+     * 6. If fromBackPressed is false we update the listView with extra data.
+     *
+     * Note : formBackPressed = true when user navigate to different screen
+     *        fromBackPressed = false when step 5 is run
+     * */
     private void getTripData() {
         TripAsyncConfig asyncConfig = new TripAsyncConfig(getActivity());
 

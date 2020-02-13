@@ -109,10 +109,11 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         btCreate.setOnClickListener(this);
         ivBack.setOnClickListener(this);
 
-        createPaidPeople();
+        //Add all the travellers in both of the chip group
+        addPeople();
     }
 
-    private void createPaidPeople() {
+    private void addPeople() {
         peopleAsyncConfig.getPersonData(tripData.getId()).observe(getViewLifecycleOwner(), new Observer<List<PersonData>>() {
             @Override
             public void onChanged(List<PersonData> personData) {
@@ -129,6 +130,13 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         });
     }
 
+    /**
+     * BillName char length should be grater then 1
+     * BillPaidPeople as there should at least on traveller who paid the bill
+     * BillAmount should be there
+     *
+     * @return true if all condition satisfy else false
+     */
     private boolean validation() {
         boolean isBillName = etBillName.getText().toString().length() > 1;
 
@@ -145,11 +153,15 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
             case R.id.bt_create:
                 if (validation()) {
                     BillData billData = createBillData();
+
+                    //Add Bill data to Bill Table
                     try {
                         billAsyncConfig.insertBillData(billData);
                     } catch (ExecutionException | InterruptedException e) {
                         e.printStackTrace();
                     } finally {
+
+                        //Sort the receiving data and sending data of Person Table
                         try {
                             peopleAsyncConfig.updatePersonData(billData, personDataList);
                         } catch (ExecutionException | InterruptedException e) {
@@ -164,12 +176,17 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         }
     }
 
+    /**
+     * @param chipGroup = Is only used as parent view
+     * @param data = Traveller detail eg. Name, Chip color, mobile number
+     * @return = A view that we want to add in chipgroup
+     */
     private View createPaidPeopleView(ChipGroup chipGroup, final PersonData data) {
-        final View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout_trip_chip, (ViewGroup) chipGroup.getParent(), false);
+        final View chipView = LayoutInflater.from(getActivity()).inflate(R.layout.layout_trip_chip, (ViewGroup) chipGroup.getParent(), false);
 
-        final ConstraintLayout layoutChip = view.findViewById(R.id.layout_chip);
+        final ConstraintLayout layoutChip = chipView.findViewById(R.id.layout_chip);
 
-        final MaterialCardView chipCardView = view.findViewById(R.id.materialCardView);
+        final MaterialCardView chipCardView = chipView.findViewById(R.id.materialCardView);
 
         final TextView tvName = layoutChip.findViewById(R.id.tv_chip_name);
 
@@ -181,10 +198,16 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
 
         setUnCheckChip(chipCardView, data);
 
+        //Switch type chipView for selected state and unselected state works for the TextView too
         layoutChip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (chipCardView.getCardBackgroundColor().getDefaultColor() == Color.WHITE) {
+                     /*
+                       1. We select a traveller
+                       2. Then show a amount popup
+                       3. If the user enter the amount and hit the save button then traveller chip is assumed as selected or else stays in unselected state
+                      */
                     createAmountPopUp(chipCardView, data, tvName);
                 } else {
                     setUnCheckChip(chipCardView, data);
@@ -196,9 +219,14 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
             }
         });
 
-        return view;
+        return chipView;
     }
 
+    /**
+     * @param chipGroup = Is only used as parent view
+     * @param data = Traveller detail eg. Name, Chip color, mobile number
+     * @return = A view that we want to add in chipgroup
+     */
     private View createBillPeopleView(ChipGroup chipGroup, final PersonData data) {
         final View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout_trip_chip, (ViewGroup) chipGroup.getParent(), false);
 
@@ -216,6 +244,7 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
 
         setCheckedChip(chipCardView, data);
 
+        //Switch type chipView for selected state and unselected state works for the TextView too
         layoutChip.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -236,6 +265,10 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         return view;
     }
 
+    /**
+     * @param isRemove = if its true then we remove for the billPeople array list else we add into it.
+     * @param data = Traveller details used for adding billPeople into array list or comparing using mobile number to remove it.
+     */
     private void setBillPeople(boolean isRemove, PersonData data) {
         if (!isRemove) {
             BillData.BillPeople people = new BillData.BillPeople();
@@ -257,6 +290,11 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         Log.d("AddBillFragment", "Bill People List size : " + billPeopleList.size());
     }
 
+    /**
+     * @param isRemove = If its true then we remove entry form the paidBillPeople array list else we add into it.
+     * @param amount = Its the amount paid by the traveller for the current build and also use to add data its data.
+     * @param data = Traveller details used for adding data in paidBillPeople array list or comparing using mobile number to remove it.
+     */
     private void setPaidBillPeople(boolean isRemove, long amount, PersonData data) {
         if (!isRemove) {
             BillData.BillPeople people = new BillData.BillPeople();
@@ -277,6 +315,12 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         finalPaidPeopleList = paidPeopleList;
     }
 
+    /**
+     * @param cardView = This view is used to pass as a parameter to change its state into checked state
+     * @param personData = Traveller details eg: Name, Person chip color etc. Its also pass as a parameter;
+     * @param tvName = As our chipView is a parent view and its is initialize as a local variable and all its childview are also local variable.
+     *               We also change the state the textView inside ChipView. So in above given condition on line number 198. We require tvName to change its state.
+     */
     private void createAmountPopUp(final MaterialCardView cardView, final PersonData personData, final TextView tvName) {
         final Dialog dialog = new Dialog(getActivity());
         dialog.setContentView(R.layout.layout_bill_amount_dialog);
@@ -319,18 +363,27 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         dialog.show();
     }
 
+    /**
+     * @param checkedChip = Change its background color and remove the stroke so the user can see its selected
+     * @param data = Use to get background color
+     */
     private void setCheckedChip(MaterialCardView checkedChip, PersonData data) {
         checkedChip.setCardBackgroundColor(data.getPersonColor());
         checkedChip.setStrokeWidth(0);
         checkedChip.setStrokeColor(Color.TRANSPARENT);
     }
 
-    private void setUnCheckChip(MaterialCardView unChekChip, PersonData data) {
-        unChekChip.setCardBackgroundColor(Color.WHITE);
-        unChekChip.setStrokeWidth(1);
-        unChekChip.setStrokeColor(Color.BLACK);
+    /**
+     * @param unCheckChip = Change its background color and add the stroke so the user can see its unslected
+     * @param data = not used for now
+     */
+    private void setUnCheckChip(MaterialCardView unCheckChip, PersonData data) {
+        unCheckChip.setCardBackgroundColor(Color.WHITE);
+        unCheckChip.setStrokeWidth(1);
+        unCheckChip.setStrokeColor(Color.BLACK);
     }
 
+    //We create a BillData that with bill Name, Amount, Trip id, paidPeople list, bill people list.
     private BillData createBillData() {
         BillData data = new BillData();
         data.setBillName(etBillName.getText().toString());
@@ -342,13 +395,22 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         return data;
     }
 
+    /*
+    * Step :
+    * 1. Create a PaidPeople data form @finalPaidPeopleList
+    * 2. Create a BillPeople data from @newBIllPeopleList
+    * 3. Compare PaidPeople traveller number with BillPeople traveller number
+    * 4. a) If true then don't set the amount as that will be the traveller who paid for the bill
+    *    b) If false then add the result amount which we get from dividing the total amount paid by the current traveller/Total number of traveller in bill people
+    * 5. After all step is completed then return the @newBillPeopleList
+    * */
     private ArrayList<BillData.BillPeople> sortBillPeople(ArrayList<BillData.BillPeople> newBillPeopleList) {
         for (int i = 0; i < finalPaidPeopleList.size(); i++) {
             BillData.BillPeople paidPeople = finalPaidPeopleList.get(i);
 
             for (int j = 0; j < newBillPeopleList.size(); j++) {
                 BillData.BillPeople billPeople = newBillPeopleList.get(j);
-                if (!paidPeople.getPeopleName().equals(billPeople.getPeopleName())) {
+                if (!paidPeople.getPeopleNumber().equals(billPeople.getPeopleNumber())) {
                     billPeople.setAmount(billPeople.getAmount() + (paidPeople.getAmount() / newBillPeopleList.size()));
                 }
             }
