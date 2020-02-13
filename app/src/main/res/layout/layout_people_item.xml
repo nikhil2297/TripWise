@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="0.1dp"
+    app:strokeColor="@color/colorBlack"
+    app:cardBackgroundColor="@color/colorWhite"
+    android:layout_height="wrap_content">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp">
+
+        <include
+            android:id="@+id/include2"
+            layout="@layout/layout_traveller_big_chip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/tv_traveller_name"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Nikhil"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/include2"
+            app:layout_constraintTop_toTopOf="@+id/include2" />
+
+        <TextView
+            android:id="@+id/tv_traveller_number"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="8655335480"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/include2"
+            app:layout_constraintTop_toBottomOf="@+id/tv_traveller_name" />
+
+        <TextView
+            android:id="@+id/tv_help_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Owes You"
+            android:textColor="#90EE90"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toStartOf="@+id/textView3"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toStartOf="@+id/tv_traveller_number"
+            app:layout_constraintTop_toBottomOf="@+id/tv_traveller_number" />
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:textColor="#FF4500"
+            android:text="You Owes"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="@+id/tv_traveller_number"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@+id/tv_help_message"
+            app:layout_constraintTop_toBottomOf="@+id/tv_traveller_number" />
+
+        <TextView
+            android:id="@+id/tv_receiving_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp"
+            android:text="500"
+            android:textColor="#90EE90"
+            android:textSize="22sp"
+            app:layout_constraintEnd_toEndOf="@+id/tv_help_message"
+            app:layout_constraintStart_toStartOf="@+id/tv_help_message"
+            app:layout_constraintTop_toBottomOf="@+id/tv_help_message" />
+
+        <TextView
+            android:id="@+id/tv_sending_amount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="8dp"
+            android:text="500"
+            android:textSize="22sp"
+            android:textColor="#FF4500"
+            app:layout_constraintEnd_toEndOf="@+id/textView3"
+            app:layout_constraintStart_toStartOf="@+id/textView3"
+            app:layout_constraintTop_toBottomOf="@+id/textView3" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -135,6 +135,11 @@ public class TripFragment extends Fragment implements TripsAdapter.ItemClickList
 
     @Override
     public void onPeopleClick(TripData tripData) {
+        fromBackPressed = true;
 
+        TripFragmentDirections.ActionTripFragmentToPeopleFragment direction = TripFragmentDirections.
+                actionTripFragmentToPeopleFragment(new Gson().toJson(tripData).toString());
+
+        controller.navigate(direction);
     }
 }

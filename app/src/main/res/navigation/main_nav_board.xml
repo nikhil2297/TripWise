@@ -22,6 +22,9 @@
             app:enterAnim="@anim/fragment_open_enter"
             app:popEnterAnim="@anim/fragment_fade_exit"
             app:popUpTo="@+id/tripFragment" />
+        <action
+            android:id="@+id/action_tripFragment_to_peopleFragment"
+            app:destination="@id/peopleFragment" />
     </fragment>
     <fragment
         android:id="@+id/billsFragment"
@@ -61,5 +64,15 @@
             android:name="latest_id"
             app:argType="integer"/>
 
+    </fragment>
+    <fragment
+        android:id="@+id/peopleFragment"
+        android:name="com.tripewise.people.PeopleFragment"
+        android:label="fragment_people"
+        tools:layout="@layout/fragment_people">
+
+        <argument
+            android:name="trip_data"
+            app:argType="string" />
     </fragment>
 </navigation>

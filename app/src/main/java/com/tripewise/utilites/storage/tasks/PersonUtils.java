@@ -78,6 +78,8 @@ public class PersonUtils {
                         details.setAmount(details.getAmount() + (billData.getBillPaidPeopleList().get(i).getAmount() / billData.getBillPeopleList().size()));
                         details.setName(details.getName());
 
+                        data.setReceivingAmount(data.getReceivingAmount() + details.getAmount());
+
                         detailsArrayList.set(j, details);
                     }
                 }
@@ -109,6 +111,8 @@ public class PersonUtils {
                         } else {
                             details.setAmount(details.getAmount());
                         }
+
+                        data.setPayingAmount(data.getPayingAmount() + details.getAmount());
 
                         detailsArrayList.set(i, details);
                     }
