@@ -240,7 +240,7 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
      * @return the chip view we created
      */
     private View createView(final PersonData data) {
-        final View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout_trip_chip, (ViewGroup) travellersChip.getParent(), false);
+        final View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout_traveller_big_chip, (ViewGroup) travellersChip.getParent(), false);
 
         final ConstraintLayout layoutChip = view.findViewById(R.id.layout_chip);
 

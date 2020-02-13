@@ -14,8 +14,8 @@ import java.util.List;
 
 @Dao
 public interface BillDao {
-    @Query("Select * from BillData")
-    LiveData<List<BillData>> getAllData();
+    @Query("Select * from BillData WHERE trip_id = :tripId")
+    LiveData<List<BillData>> getAllData(int tripId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long insertBilldata(BillData data);

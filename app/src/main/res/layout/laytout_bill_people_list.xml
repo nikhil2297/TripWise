@@ -25,10 +25,10 @@
         <CheckBox
             android:id="@+id/is_check"
             android:layout_width="0dp"
-            android:padding="10dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center_vertical"
-            android:layout_weight="0.3" />
+            android:layout_weight="0.3"
+            android:padding="10dp" />
     </LinearLayout>
 
     <androidx.recyclerview.widget.RecyclerView

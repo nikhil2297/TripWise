@@ -1,6 +1,10 @@
 package com.tripewise.utilites;
 
+import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Color;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -70,5 +74,9 @@ public class Util {
         } else {
             return color;
         }
+    }
+
+    public static float convertPixelToDp(){
+        return (Resources.getSystem().getDisplayMetrics().widthPixels / Resources.getSystem().getDisplayMetrics().density);
     }
 }

@@ -11,6 +11,7 @@
     <string name="bill_name">Bill Name</string>
     <string name="date_fromat">DD MMM yyyy</string>
     <string name="time_optional_format">HH:mm (optional)</string>
+    <string name="bill_amount">Bill Amount : <b>₹%1$d</b></string>
     <string name="text_bill_paid_buy">Bill Paid by :</string>
     <string name="bill_help_message_1">Select Names</string>
     <string name="bill_help_message_2">People to be included :</string>

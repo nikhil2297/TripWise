@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.LiveData;
 import androidx.lifecycle.Observer;
 
 import com.tripewise.utilites.storage.TripStorage;
@@ -42,15 +43,8 @@ public class BillAsyncConfig {
         return billData;
     }
 
-    public void onBillDataChange(final BillConfigListener listener) {
-        this.listener = listener;
-
-        storage.billDao().getAllData().observe((LifecycleOwner) context, new Observer<List<BillData>>() {
-            @Override
-            public void onChanged(List<BillData> billData) {
-                listener.onDataChange(billData);
-            }
-        });
+    public LiveData<List<BillData>> getBillData(int tripId){
+        return storage.billDao().getAllData(tripId);
     }
 
     public void updateBillData(BillData billData) throws ExecutionException, InterruptedException {

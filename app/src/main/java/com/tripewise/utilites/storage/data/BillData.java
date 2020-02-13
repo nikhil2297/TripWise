@@ -46,6 +46,9 @@ public class BillData {
         @ColumnInfo(name = "bill_people_number")
         private String peopleNumber;
 
+        @ColumnInfo(name = "bill_people_color")
+        private int peopleColor;
+
         private boolean isCheck;
 
         public String getPeopleName() {
@@ -78,6 +81,14 @@ public class BillData {
 
         public void setCheck(boolean check) {
             isCheck = check;
+        }
+
+        public int getPeopleColor() {
+            return peopleColor;
+        }
+
+        public void setPeopleColor(int peopleColor) {
+            this.peopleColor = peopleColor;
         }
     }
 
