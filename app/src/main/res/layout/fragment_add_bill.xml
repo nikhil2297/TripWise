@@ -61,6 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8sp"
             android:hint="Amount"
+            app:etInputType="number"
             app:layout_constraintEnd_toEndOf="@id/et_bill_name"
             app:layout_constraintStart_toStartOf="@id/et_bill_name"
             app:layout_constraintTop_toBottomOf="@id/et_bill_name"
@@ -81,6 +82,8 @@
             android:id="@+id/horizontalScrollView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:scrollbars="none"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@id/guideline"
             app:layout_constraintTop_toBottomOf="@+id/tv_help_message_1">
 
@@ -108,6 +111,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:scrollbars="none"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="@+id/guideline"
             app:layout_constraintTop_toBottomOf="@+id/textView2">
 

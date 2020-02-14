@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PersonUtils {
+    private final String TAG = this.getClass().getSimpleName();
     private BillData billData;
 
     private List<PersonData> personData;
@@ -30,6 +31,10 @@ public class PersonUtils {
 
         for (PersonData data : personData) {
             sortSendDetails(data);
+        }
+
+        for (PersonData data : personData) {
+            calculatePaymentDetails(data);
         }
 
         for (PersonData data : personData) {
@@ -77,14 +82,21 @@ public class PersonUtils {
 
             int receivingPeopleSize = paymentDetailsData.getReceiveDetails().size();
             int paidPeopleSize = billData.getBillPaidPeopleList().size();
+            int billPeopleSize = billData.getBillPeopleList().size();
 
             for (int i = 0; i < paidPeopleSize; i++) {
                 if (data.getMobileNumber().equals(billData.getBillPaidPeopleList().get(i).getPeopleNumber())) {
                     for (int j = 0; j < receivingPeopleSize; j++) {
                         PaymentDetailsData.Details details = paymentDetailsData.getReceiveDetails().get(j);
 
-                        details.setAmount(details.getAmount() + (billData.getBillPaidPeopleList().get(i).getAmount() / billData.getBillPeopleList().size()));
-                        details.setName(details.getName());
+                        for (int k = 0; k < billPeopleSize; k++) {
+                            BillData.BillPeople billPeople = billData.getBillPeopleList().get(k);
+
+                            if (details.getMobileNumber().equals(billPeople.getPeopleNumber())) {
+                                details.setAmount(details.getAmount() + (billData.getBillPaidPeopleList().get(i).getAmount() / billPeopleSize));
+                                details.setName(details.getName());
+                            }
+                        }
 
                         detailsArrayList.set(j, details);
                     }
@@ -104,6 +116,7 @@ public class PersonUtils {
 
             int sendingPeopleSize = paymentDetailsData.getSendDetails().size();
             int paidPeopleSize = billData.getBillPaidPeopleList().size();
+            int billPeopleSize = billData.getBillPeopleList().size();
 
             for (int i = 0; i < sendingPeopleSize; i++) {
                 for (int j = 0; j < paidPeopleSize; j++) {
@@ -113,7 +126,13 @@ public class PersonUtils {
                         PaymentDetailsData.Details details = paymentDetailsData.getSendDetails().get(i);
 
                         if (data.getPaymentData().getSendDetails().get(i).getMobileNumber().equals(billPersonNumber)) {
-                            details.setAmount(details.getAmount() + (billData.getBillPaidPeopleList().get(j).getAmount() / billData.getBillPeopleList().size()));
+                            for (int k = 0; k < billPeopleSize; k++) {
+                                BillData.BillPeople billPeople = billData.getBillPeopleList().get(k);
+
+                                if (data.getMobileNumber().equals(billPeople.getPeopleNumber())) {
+                                    details.setAmount(details.getAmount() + (billData.getBillPaidPeopleList().get(j).getAmount() / billData.getBillPeopleList().size()));
+                                }
+                            }
                         } else {
                             details.setAmount(details.getAmount());
                         }
@@ -129,8 +148,8 @@ public class PersonUtils {
         }
     }
 
-    private void getTotalReceivingAmount(PersonData data){
-        if (data != null){
+    private void getTotalReceivingAmount(PersonData data) {
+        if (data != null) {
             data.setReceivingAmount(0);
 
             PaymentDetailsData paymentData = data.getPaymentData();
@@ -143,8 +162,8 @@ public class PersonUtils {
         }
     }
 
-    private void getTotalPayingAmount(PersonData data){
-        if (data != null){
+    private void getTotalPayingAmount(PersonData data) {
+        if (data != null) {
             data.setPayingAmount(0);
 
             PaymentDetailsData paymentData = data.getPaymentData();
@@ -161,6 +180,12 @@ public class PersonUtils {
 
         for (PersonData data : personData) {
             calculatePaymentDetails(data);
+        }
+
+        for (PersonData data : personData) {
+            getTotalPayingAmount(data);
+
+            getTotalReceivingAmount(data);
         }
 
         return personData;
@@ -183,6 +208,8 @@ public class PersonUtils {
                     long sendingAmount = sendingDetails.getAmount();
 
                     long finalResult = receiveAmount - sendingAmount;
+
+                    Log.e(TAG, "Receiving Person Name = " + receivingDetails.getName() + " Send Person Name = " + sendingDetails.getName() + " Final Result = " + finalResult);
 
                     if (finalResult > 0) {
 

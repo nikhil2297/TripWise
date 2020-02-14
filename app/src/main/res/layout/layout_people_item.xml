@@ -50,7 +50,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:text="Owes You"
+            android:text="You get back"
             android:textColor="#90EE90"
             android:textSize="16sp"
             app:layout_constraintEnd_toStartOf="@+id/textView3"
