@@ -16,6 +16,9 @@
     <color name="colorLightGrey">#BFBFBF</color>
     <color name="colorLightGrey2">#F9F9F9</color>
 
+    <color name="colorAmountRed">#FF4500</color>
+    <color name="colorAmountGreen">#90EE90</color>
+
     <color name="colorRedTransparent">#60000000</color>
     <color name="colorTransparent">#00000000</color>
 </resources>

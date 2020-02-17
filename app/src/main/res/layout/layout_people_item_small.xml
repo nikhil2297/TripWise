@@ -1,6 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+
+    <include
+        android:id="@+id/include4"
+        layout="@layout/layout_traveller_big_chip"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="@+id/pb_amount"
+        app:layout_constraintEnd_toEndOf="@+id/pb_amount"
+        app:layout_constraintStart_toStartOf="@+id/pb_amount"
+        app:layout_constraintTop_toTopOf="@+id/pb_amount" />
+
+    <ProgressBar
+        android:id="@+id/pb_amount"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:max="100"
+        android:progress="20"
+        android:progressDrawable="@drawable/progress_bar_layer"
+        android:secondaryProgress="100"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tv_traveller_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="Nikhil"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/pb_amount"
+        app:layout_constraintTop_toTopOf="@+id/include4" />
+
+    <TextView
+        android:id="@+id/tv_traveller_number"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:padding="8dp"
+        android:text="8655335480"
+        android:textSize="18sp"
+        app:layout_constraintBottom_toBottomOf="@+id/pb_amount"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/pb_amount"
+        app:layout_constraintTop_toBottomOf="@+id/tv_traveller_name" />
+
+    <include
+        layout="@layout/layout_amount_speration"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pb_amount" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

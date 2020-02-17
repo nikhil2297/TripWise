@@ -63,8 +63,8 @@ public class PeopleAdapter extends RecyclerView.Adapter<PeopleAdapter.ItemHolder
             tvChipName = itemView.findViewById(R.id.tv_chip_name);
             tvTravellerName = itemView.findViewById(R.id.tv_traveller_name);
             tvTravellerMobileNumber = itemView.findViewById(R.id.tv_traveller_number);
-            tvAmountReceive = itemView.findViewById(R.id.tv_receiving_amount);
-            tvAmountSend = itemView.findViewById(R.id.tv_sending_amount);
+            tvAmountReceive = itemView.findViewById(R.id.tv_amount_receive);
+            tvAmountSend = itemView.findViewById(R.id.tv_amount_send);
 
             chipCardView = itemView.findViewById(R.id.materialCardView);
         }
