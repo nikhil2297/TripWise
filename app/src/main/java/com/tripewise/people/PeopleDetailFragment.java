@@ -11,10 +11,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
-import com.google.android.material.tabs.TabLayout;
 import com.tripewise.R;
 import com.tripewise.utilites.storage.data.PaymentDetailsData;
 import com.tripewise.utilites.storage.data.PersonData;
@@ -50,6 +51,9 @@ public class PeopleDetailFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        PeopleDetailFragmentArgs args = PeopleDetailFragmentArgs.fromBundle(getArguments());
+        mobileNumber = args.getMobileNumber();
+        tripId = args.getTripId();
     }
 
     @Nullable
@@ -75,24 +79,59 @@ public class PeopleDetailFragment extends Fragment {
         tvTotalSendAmount = view.findViewById(R.id.tv_amount_send);
         tvChipText = view.findViewById(R.id.tv_chip_name);
 
-        finalPeopleList = new ArrayList<>();
+        init();
+    }
+
+    private void init() {
+        LinearLayoutManager manager = new LinearLayoutManager(getActivity());
+        rvPeople.setLayoutManager(manager);
+
+        DividerItemDecoration itemDecoration = new DividerItemDecoration(rvPeople.getContext(), DividerItemDecoration.VERTICAL);
+        itemDecoration.setDrawable(getResources().getDrawable(R.drawable.recycler_view_divider));
+
+        rvPeople.addItemDecoration(itemDecoration);
 
         asyncConfig = new PeopleAsyncConfig(getActivity());
+
+        finalPeopleList = new ArrayList<>();
 
         getPersonData();
     }
 
-    private void getPersonData(){
+    private void getPersonData() {
         asyncConfig.getPersonData(tripId).observe(getViewLifecycleOwner(), new Observer<List<PersonData>>() {
             @Override
             public void onChanged(List<PersonData> personDataList) {
+                PeopleDetailsAdapter adapter = new PeopleDetailsAdapter(getActivity(), sortPersonData(personDataList));
 
+                rvPeople.setAdapter(adapter);
+
+                for (PersonData data : personDataList) {
+                    if (data.getMobileNumber().equals(mobileNumber)) {
+                        setUpPersonData(data);
+                    }
+                }
             }
         });
     }
 
-    private List<TravellerItemObject> sortPersonData(List<PersonData> personDataList){
-        for (PersonData data : personDataList){
+    private void setUpPersonData(PersonData personData) {
+        tvTravellerName.setText(personData.getPersonName());
+        tvTravellerNumber.setText(personData.getMobileNumber());
+        tvTotalReceiveAmount.setText(getActivity().getResources().getString(R.string.amount, personData.getReceivingAmount()));
+        tvTotalSendAmount.setText(getActivity().getResources().getString(R.string.amount, personData.getPayingAmount()));
+        tvTotalAmountPaid.setText(getActivity().getResources().getString(R.string.amount, personData.getTotalAmountPaid()));
+
+        tvChipText.setText(personData.getPersonName().substring(0, 2).toUpperCase());
+        chipCardView.setCardBackgroundColor(personData.getPersonColor());
+
+        pbMoneyStatus.setMax((int) (personData.getReceivingAmount() + personData.getPayingAmount()));
+        pbMoneyStatus.setProgress((int) personData.getReceivingAmount());
+        pbMoneyStatus.setSecondaryProgress(pbMoneyStatus.getMax());
+    }
+
+    private List<TravellerItemObject> sortPersonData(List<PersonData> personDataList) {
+        for (PersonData data : personDataList) {
             if (data.getMobileNumber().equals(mobileNumber)) {
                 sortTransactionData(data.getPaymentData(), data.getPersonColor());
             }
@@ -103,15 +142,16 @@ public class PeopleDetailFragment extends Fragment {
         return finalPeopleList;
     }
 
-    private void sortTransactionData(PaymentDetailsData detailsData, int color){
+    private void sortTransactionData(PaymentDetailsData detailsData, int color) {
         Iterator<PaymentDetailsData.Details> receiveDetailIteration = detailsData.getReceiveDetails().listIterator();
 
-        while (receiveDetailIteration.hasNext()){
-            if (receiveDetailIteration.next().getAmount() <= 0){
+        while (receiveDetailIteration.hasNext()) {
+            PaymentDetailsData.Details receiveDetails = receiveDetailIteration.next();
+            if (receiveDetails.getAmount() <= 0) {
                 receiveDetailIteration.remove();
-            }else {
+            } else {
                 TravellerItemObject itemObject = new TravellerItemObject();
-                itemObject.setDetailsData(receiveDetailIteration.next());
+                itemObject.setDetailsData(receiveDetails);
                 itemObject.setReceive(true);
 
                 finalPeopleList.add(itemObject);
@@ -120,12 +160,13 @@ public class PeopleDetailFragment extends Fragment {
 
         Iterator<PaymentDetailsData.Details> sendDetailIterator = detailsData.getSendDetails().listIterator();
 
-        while (sendDetailIterator.hasNext()){
-            if (sendDetailIterator.next().getAmount() <= 0){
+        while (sendDetailIterator.hasNext()) {
+            PaymentDetailsData.Details sendDetails = sendDetailIterator.next();
+            if (sendDetails.getAmount() <= 0) {
                 sendDetailIterator.remove();
-            }else {
+            } else {
                 TravellerItemObject itemObject = new TravellerItemObject();
-                itemObject.setDetailsData(receiveDetailIteration.next());
+                itemObject.setDetailsData(sendDetails);
                 itemObject.setReceive(false);
 
                 finalPeopleList.add(itemObject);
@@ -133,14 +174,14 @@ public class PeopleDetailFragment extends Fragment {
         }
     }
 
-    private void updateFinalPersonList(List<PersonData> personDataList){
-        for (int i = 0 ; i < personDataList.size() ; i++){
+    private void updateFinalPersonList(List<PersonData> personDataList) {
+        for (int i = 0; i < personDataList.size(); i++) {
             PersonData data = personDataList.get(i);
 
-            for (int j = 0 ; j < finalPeopleList.size() ; j++){
+            for (int j = 0; j < finalPeopleList.size(); j++) {
                 TravellerItemObject itemObject = finalPeopleList.get(j);
 
-                if (data.getMobileNumber().equals(itemObject.getDetailsData().getMobileNumber())){
+                if (data.getMobileNumber().equals(itemObject.getDetailsData().getMobileNumber())) {
                     itemObject.setPersonColor(data.getPersonColor());
                 }
             }
@@ -154,7 +195,7 @@ public class PeopleDetailFragment extends Fragment {
 
         private boolean isReceive;
 
-        public int getPersonColor() {
+        int getPersonColor() {
             return personColor;
         }
 
@@ -170,11 +211,11 @@ public class PeopleDetailFragment extends Fragment {
             this.detailsData = detailsData;
         }
 
-        public boolean isReceive() {
+        boolean isReceive() {
             return isReceive;
         }
 
-        public void setReceive(boolean receive) {
+        void setReceive(boolean receive) {
             isReceive = receive;
         }
     }

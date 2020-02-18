@@ -26,6 +26,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:hint="Traveller Name"
+        app:etInputType="capWords"
         app:layout_constraintEnd_toStartOf="@+id/guideline9"
         app:layout_constraintStart_toStartOf="@+id/guideline8"
         app:layout_constraintTop_toBottomOf="@+id/tv_help_message"

@@ -74,5 +74,21 @@
         <argument
             android:name="trip_data"
             app:argType="string" />
+        <action
+            android:id="@+id/action_peopleFragment_to_peopleDetailFragment"
+            app:destination="@id/peopleDetailFragment"
+            app:popUpTo="@+id/peopleFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/peopleDetailFragment"
+        android:name="com.tripewise.people.PeopleDetailFragment"
+        android:label="fragment_person_details"
+        tools:layout="@layout/fragment_person_details" >
+        <argument
+            android:name="mobileNumber"
+            app:argType="string" />
+        <argument
+            android:name="tripId"
+            app:argType="integer" />
     </fragment>
 </navigation>

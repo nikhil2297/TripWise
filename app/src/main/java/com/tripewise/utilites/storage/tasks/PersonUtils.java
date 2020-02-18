@@ -41,6 +41,8 @@ public class PersonUtils {
             getTotalPayingAmount(data);
 
             getTotalReceivingAmount(data);
+
+            getTotalPaidAmount(data);
         }
 
         return personData;
@@ -61,6 +63,14 @@ public class PersonUtils {
         if (personData != null) {
             PaymentDetailsData detailsData = personData.getPaymentData();
 
+            ArrayList<PaymentDetailsData.Details> detailsDataList;
+
+            if (detailsData.getPaidDetails() != null) {
+                detailsDataList = detailsData.getPaidDetails();
+            } else {
+                detailsDataList = new ArrayList<>();
+            }
+
             PaymentDetailsData.Details details = new PaymentDetailsData.Details();
 
             details.setName(billPeople.getPeopleName());
@@ -68,7 +78,9 @@ public class PersonUtils {
             details.setBillName(billData.getBillName());
             details.setMobileNumber(personData.getMobileNumber());
 
-            detailsData.setPaidData(details);
+            detailsDataList.add(details);
+
+            detailsData.setPaidDetails(detailsDataList);
 
             personData.setPaymentDetails(new Gson().toJson(detailsData).toString());
         }
@@ -176,6 +188,24 @@ public class PersonUtils {
         }
     }
 
+    private void getTotalPaidAmount(PersonData data) {
+        if (data != null) {
+            data.setTotalAmountPaid(0);
+
+            PaymentDetailsData paymentData = data.getPaymentData();
+
+            if (paymentData.getPaidDetails() != null) {
+                for (PaymentDetailsData.Details details : paymentData.getPaidDetails()) {
+                    if (details != null) {
+                        data.setTotalAmountPaid(data.getTotalAmountPaid() + details.getAmount());
+                    }
+                }
+            }
+
+            Log.d("PersonUitls", "Name : " + data.getPersonName() + " Total Paid amount : " + data.getTotalAmountPaid());
+        }
+    }
+
     List<PersonData> finalCalculation() {
 
         for (PersonData data : personData) {
@@ -186,6 +216,8 @@ public class PersonUtils {
             getTotalPayingAmount(data);
 
             getTotalReceivingAmount(data);
+
+
         }
 
         return personData;

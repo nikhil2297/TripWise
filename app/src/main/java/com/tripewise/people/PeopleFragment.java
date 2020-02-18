@@ -11,6 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -24,6 +26,8 @@ import com.tripewise.utilites.storage.tasks.PeopleAsyncConfig;
 import java.util.List;
 
 public class PeopleFragment extends Fragment {
+    private NavController controller;
+
     private TripData tripData;
 
     private PeopleAsyncConfig peopleConfig;
@@ -52,6 +56,8 @@ public class PeopleFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        controller = NavHostFragment.findNavController(this);
 
         tvTripName = view.findViewById(R.id.tv_trip_name);
 
@@ -82,7 +88,13 @@ public class PeopleFragment extends Fragment {
         peopleConfig.getPersonData(tripData.getId()).observe(getViewLifecycleOwner(), new Observer<List<PersonData>>() {
             @Override
             public void onChanged(List<PersonData> personData) {
-                PeopleAdapter adapter = new PeopleAdapter(getActivity(), personData);
+                PeopleAdapter adapter = PeopleAdapter.newInstance(getActivity(), personData, new PeopleAdapter.PeopleAdapterListener() {
+                    @Override
+                    public void onPersonClick(PersonData personData) {
+                        PeopleFragmentDirections.ActionPeopleFragmentToPeopleDetailFragment direction = PeopleFragmentDirections.actionPeopleFragmentToPeopleDetailFragment(personData.getMobileNumber(), tripData.getId());
+                        controller.navigate(direction);
+                    }
+                });
 
                 rvPeople.setAdapter(adapter);
             }

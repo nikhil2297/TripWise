@@ -18,4 +18,6 @@
     <string name="bill_help_message_3">If none of the people are selected by default all members will be include</string>
 
     <string name="amount">₹%1$d</string>
+    <string name="receive_amount">+₹%1$d</string>
+    <string name="send_amount">-₹%1$d</string>
 </resources>

@@ -21,7 +21,7 @@
 
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/tv_traveller_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Nikhil"
@@ -32,7 +32,7 @@
             app:layout_constraintTop_toTopOf="@+id/include5" />
 
         <TextView
-            android:id="@+id/textView9"
+            android:id="@+id/tv_traveller_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="9865533548"
@@ -40,17 +40,18 @@
             android:layout_marginStart="8dp"
             app:layout_constraintBottom_toBottomOf="@+id/include5"
             app:layout_constraintStart_toEndOf="@+id/include5"
-            app:layout_constraintTop_toBottomOf="@+id/textView3" />
+            app:layout_constraintTop_toBottomOf="@+id/tv_traveller_name" />
 
         <TextView
+            android:id="@+id/tv_amount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="+$700"
             android:textSize="20sp"
             android:textStyle="bold"
-            app:layout_constraintBottom_toBottomOf="@+id/textView9"
+            app:layout_constraintBottom_toBottomOf="@+id/tv_traveller_number"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/textView3">
+            app:layout_constraintTop_toTopOf="@+id/tv_traveller_name"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </com.google.android.material.card.MaterialCardView>
