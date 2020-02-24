@@ -609,7 +609,9 @@ public class CustomEditText extends TextInputLayout implements TextWatcher, Text
 
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-        editorActionListener.onEditorAction(v, actionId, event);
+        if(editorActionListener != null) {
+            editorActionListener.onEditorAction(v, actionId, event);
+        }
         return false;
     }
 
