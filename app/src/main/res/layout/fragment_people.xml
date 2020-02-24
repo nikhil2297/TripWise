@@ -6,7 +6,7 @@
 
     <TextView
         android:id="@+id/tv_trip_name"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:background="@color/colorPrimary"
         android:padding="20dp"
@@ -23,6 +23,7 @@
         android:paddingStart="4dp"
         android:paddingEnd="4dp"
         android:src="@drawable/ic_arrow_back"
+        android:background="@color/colorPrimary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@id/tv_trip_name"
         app:layout_constraintBottom_toBottomOf="@id/tv_trip_name"/>
