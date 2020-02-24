@@ -88,7 +88,7 @@
             android:name="mobileNumber"
             app:argType="string" />
         <argument
-            android:name="tripId"
-            app:argType="integer" />
+            android:name="trip_data"
+            app:argType="string" />
     </fragment>
 </navigation>

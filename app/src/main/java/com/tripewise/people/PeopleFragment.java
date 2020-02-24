@@ -81,6 +81,13 @@ public class PeopleFragment extends Fragment {
 
         peopleConfig = new PeopleAsyncConfig(getActivity());
 
+        ivBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                controller.popBackStack();
+            }
+        });
+
         createPeopleList();
     }
 
@@ -91,7 +98,7 @@ public class PeopleFragment extends Fragment {
                 PeopleAdapter adapter = PeopleAdapter.newInstance(getActivity(), personData, new PeopleAdapter.PeopleAdapterListener() {
                     @Override
                     public void onPersonClick(PersonData personData) {
-                        PeopleFragmentDirections.ActionPeopleFragmentToPeopleDetailFragment direction = PeopleFragmentDirections.actionPeopleFragmentToPeopleDetailFragment(personData.getMobileNumber(), tripData.getId());
+                        PeopleFragmentDirections.ActionPeopleFragmentToPeopleDetailFragment direction = PeopleFragmentDirections.actionPeopleFragmentToPeopleDetailFragment(personData.getMobileNumber(), new Gson().toJson(tripData).toString());
                         controller.navigate(direction);
                     }
                 });

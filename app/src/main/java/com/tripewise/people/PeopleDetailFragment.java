@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -11,14 +12,18 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.card.MaterialCardView;
+import com.google.gson.Gson;
 import com.tripewise.R;
 import com.tripewise.utilites.storage.data.PaymentDetailsData;
 import com.tripewise.utilites.storage.data.PersonData;
+import com.tripewise.utilites.storage.data.TripData;
 import com.tripewise.utilites.storage.tasks.PeopleAsyncConfig;
 
 import java.util.ArrayList;
@@ -26,6 +31,8 @@ import java.util.Iterator;
 import java.util.List;
 
 public class PeopleDetailFragment extends Fragment {
+    private NavController controller;
+
     private RecyclerView rvPeople;
 
     private ProgressBar pbMoneyStatus;
@@ -38,10 +45,13 @@ public class PeopleDetailFragment extends Fragment {
     private TextView tvTotalReceiveAmount;
     private TextView tvTotalSendAmount;
     private TextView tvChipText;
+    private TextView tvTripName;
+
+    private ImageView ivBack;
 
     private String mobileNumber;
 
-    private int tripId;
+    private TripData tripData;
 
     private List<TravellerItemObject> finalPeopleList;
 
@@ -53,7 +63,7 @@ public class PeopleDetailFragment extends Fragment {
 
         PeopleDetailFragmentArgs args = PeopleDetailFragmentArgs.fromBundle(getArguments());
         mobileNumber = args.getMobileNumber();
-        tripId = args.getTripId();
+        tripData = new Gson().fromJson(args.getTripData(), TripData.class);
     }
 
     @Nullable
@@ -65,6 +75,8 @@ public class PeopleDetailFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        controller = NavHostFragment.findNavController(this);
 
         rvPeople = view.findViewById(R.id.rv_people);
 
@@ -78,11 +90,16 @@ public class PeopleDetailFragment extends Fragment {
         tvTotalReceiveAmount = view.findViewById(R.id.tv_amount_receive);
         tvTotalSendAmount = view.findViewById(R.id.tv_amount_send);
         tvChipText = view.findViewById(R.id.tv_chip_name);
+        tvTripName = view.findViewById(R.id.tv_trip_name);
+
+        ivBack = view.findViewById(R.id.iv_back);
 
         init();
     }
 
     private void init() {
+        tvTripName.setText(tripData.getTripName());
+
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
         rvPeople.setLayoutManager(manager);
 
@@ -95,11 +112,18 @@ public class PeopleDetailFragment extends Fragment {
 
         finalPeopleList = new ArrayList<>();
 
+        ivBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                controller.popBackStack();
+            }
+        });
+
         getPersonData();
     }
 
     private void getPersonData() {
-        asyncConfig.getPersonData(tripId).observe(getViewLifecycleOwner(), new Observer<List<PersonData>>() {
+        asyncConfig.getPersonData(tripData.getId()).observe(getViewLifecycleOwner(), new Observer<List<PersonData>>() {
             @Override
             public void onChanged(List<PersonData> personDataList) {
                 PeopleDetailsAdapter adapter = new PeopleDetailsAdapter(getActivity(), sortPersonData(personDataList));
