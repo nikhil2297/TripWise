@@ -4,11 +4,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import androidx.lifecycle.LifecycleOwner;
 import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MediatorLiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.Observer;
 
 import com.google.gson.Gson;
 import com.tripewise.utilites.storage.TripStorage;
@@ -16,7 +12,6 @@ import com.tripewise.utilites.storage.data.BillData;
 import com.tripewise.utilites.storage.data.PersonData;
 
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 
 public class PeopleAsyncConfig {
@@ -88,9 +83,9 @@ public class PeopleAsyncConfig {
     }
 
     public void updatePersonData(BillData billData, List<PersonData> personDataList) throws ExecutionException, InterruptedException {
-        PersonUtils personUtils = new PersonUtils(billData, personDataList);
+        PersonHelper personHelper = new PersonHelper(billData, personDataList);
 
-        for (PersonData personData : personUtils.initPersonData()) {
+        for (PersonData personData : personHelper.initPersonData()) {
             Log.d("PeopleAsyncConfig : ", new Gson().toJson(personData).toString());
 
             updatePersonData(personData);
@@ -108,11 +103,5 @@ public class PeopleAsyncConfig {
         protected Integer doInBackground(Void... voids) {
             return storage.personDao().updatePersonData(data);
         }
-    }
-
-    public List<PersonData> getCalculatedPersonResult(List<PersonData> personDataList) {
-        PersonUtils personUtils = new PersonUtils(null, personDataList);
-
-        return personUtils.finalCalculation();
     }
 }
