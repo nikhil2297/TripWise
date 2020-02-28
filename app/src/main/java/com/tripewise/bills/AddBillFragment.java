@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -23,6 +24,7 @@ import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.ChipGroup;
 import com.google.gson.Gson;
 import com.tripewise.R;
+import com.tripewise.people.PeopleViewModel;
 import com.tripewise.utilites.CustomEditText;
 import com.tripewise.utilites.storage.data.BillData;
 import com.tripewise.utilites.storage.data.PersonData;
@@ -58,9 +60,9 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     private ArrayList<BillData.BillPeople> finalBillPeopleList;
     private ArrayList<BillData.BillPeople> finalPaidPeopleList;
 
-    private PeopleAsyncConfig peopleAsyncConfig;
+    private PeopleViewModel peopleViewModel;
 
-    private BillAsyncConfig billAsyncConfig;
+    private BillViewModel billViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -96,9 +98,9 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     }
 
     private void init() {
-        billAsyncConfig = new BillAsyncConfig(getActivity());
+        billViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(BillViewModel.class);
 
-        peopleAsyncConfig = new PeopleAsyncConfig(getActivity());
+        peopleViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(PeopleViewModel.class);
 
         finalBillPeopleList = new ArrayList<>();
         finalPaidPeopleList = new ArrayList<>();
@@ -114,12 +116,12 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     }
 
     private void addPeople() {
-        peopleAsyncConfig.getPersonData(tripData.getId()).observe(getViewLifecycleOwner(), new Observer<List<PersonData>>() {
+        peopleViewModel.fetchPersonDetails(getActivity(), PersonData.class, tripData.getId(), new Observer<Object>() {
             @Override
-            public void onChanged(List<PersonData> personData) {
-                personDataList = personData;
+            public void onChanged(Object o) {
+                personDataList = (List<PersonData>) o;
 
-                for (PersonData data : personData) {
+                for (PersonData data : personDataList) {
                     billPayerChip.addView(createPaidPeopleView(billPayerChip, data));
 
                     billPeopleChip.addView(createBillPeopleView(billPeopleChip, data));
@@ -155,27 +157,23 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
                     BillData billData = createBillData();
 
                     //Add Bill data to Bill Table
-                    try {
-                        billAsyncConfig.insertBillData(billData);
-                    } catch (ExecutionException | InterruptedException e) {
-                        e.printStackTrace();
-                    } finally {
+                    insertBillData(billData);
+                    //Sort the receiving data and sending data of Person Table
 
-                        //Sort the receiving data and sending data of Person Table
-                        try {
-                            peopleAsyncConfig.updatePersonData(billData, personDataList);
-                        } catch (ExecutionException | InterruptedException e) {
-                            e.printStackTrace();
-                        } finally {
-                            controller.popBackStack();
-                        }
-                    }
                 }
                 break;
             case R.id.iv_back:
                 controller.popBackStack();
                 break;
         }
+    }
+
+    private void insertBillData(BillData billData){
+        billViewModel.insertBillData(getActivity(), BillData.class.getSimpleName(), billData);
+    }
+
+    private void insertPersonData(){
+
     }
 
     /**

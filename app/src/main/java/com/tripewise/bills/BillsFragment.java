@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -22,7 +23,6 @@ import com.google.gson.Gson;
 import com.tripewise.R;
 import com.tripewise.utilites.storage.data.BillData;
 import com.tripewise.utilites.storage.data.TripData;
-import com.tripewise.utilites.storage.tasks.BillAsyncConfig;
 
 import java.util.List;
 
@@ -37,6 +37,8 @@ public class BillsFragment extends Fragment implements View.OnClickListener {
     private NavController controller;
 
     private ImageView ivBack;
+
+    private BillViewModel billViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -72,6 +74,7 @@ public class BillsFragment extends Fragment implements View.OnClickListener {
     }
 
     private void init() {
+        billViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(BillViewModel.class);
         /*
          * StaggeredGridLayoutManager is used for Grid like recyclerview with require row count and orientation
          * Mainly its use for show list of uneven view just like Google keep app
@@ -93,11 +96,10 @@ public class BillsFragment extends Fragment implements View.OnClickListener {
     }
 
     private void getBillData() {
-        BillAsyncConfig asyncConfig = new BillAsyncConfig(getActivity());
-        asyncConfig.getBillData(tripData.getId()).observe(getViewLifecycleOwner(), new Observer<List<BillData>>() {
+        billViewModel.getBillData(getActivity(), BillData.class.getSimpleName(), tripData.getId(), new Observer<Object>() {
             @Override
-            public void onChanged(List<BillData> billData) {
-                BillsAdapter adapter = new BillsAdapter(getActivity(), billData);
+            public void onChanged(Object o) {
+                BillsAdapter adapter = new BillsAdapter(getActivity(), (List<BillData>) o);
 
                 rvBills.setAdapter(adapter);
             }
@@ -106,9 +108,10 @@ public class BillsFragment extends Fragment implements View.OnClickListener {
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.fab_add_bills:
-                BillsFragmentDirections.ActionBillsFragmentToAddBillFragment direction = BillsFragmentDirections.actionBillsFragmentToAddBillFragment(new Gson().toJson(tripData).toString());
+                BillsFragmentDirections.ActionBillsFragmentToAddBillFragment direction =
+                        BillsFragmentDirections.actionBillsFragmentToAddBillFragment(new Gson().toJson(tripData).toString());
                 controller.navigate(direction);
                 break;
             case R.id.iv_back:
