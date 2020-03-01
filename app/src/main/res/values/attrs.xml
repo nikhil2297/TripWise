@@ -9,8 +9,8 @@
         <attr name="textColorHighlight" format="color" />
         <attr name="textColorHint" format="color" />
         <attr name="textSize" format="dimension" />
-        <attr name="textStyle" />
-        <attr name="textColorLink" />
+<!--        <attr name="textStyle" />
+        <attr name="textColorLink" />-->
         <attr name="cursorVisible" format="boolean" />
         <attr name="visibilty" format="enum">
             <enum name="visible" value="0" />
@@ -23,20 +23,20 @@
         <attr name="maxEms" format="integer" min="0" />
         <attr name="ems" format="integer" min="0" />
         <attr name="minEms" format="integer" min="0" />
-        <attr name="gravity" />
+<!--        <attr name="gravity" />-->
         <attr name="scrollHorizontally" format="boolean" />
         <attr name="singleLine" format="boolean" />
         <attr name="enabled" format="boolean" />
         <attr name="selectAllOnFocus" format="boolean" />
         <attr name="includeFontPadding" format="boolean" />
         <attr name="maxLength" format="integer" min="0" />
-        <attr name="shadowColor" />
+<!--        <attr name="shadowColor" />
         <attr name="shadowDx" />
         <attr name="shadowDy" />
-        <attr name="shadowRadius" />
+        <attr name="shadowRadius" />-->
         <attr name="linksClickable" format="boolean" />
         <attr name="freezesText" format="boolean" />
-        <attr name="ellipsize" />
+<!--        <attr name="ellipsize" />-->
         <attr name="drawableTop" format="reference|color" />
         <attr name="drawableBottom" format="reference|color" />
         <attr name="drawableLeft" format="reference|color" />
@@ -65,24 +65,24 @@
             <enum name="uri" value="16" />
         </attr>
 
-        <!-- Reference to a drawable that will be used to display a text selection
-             anchor on the left side of a selection region. -->
+<!--        &lt;!&ndash; Reference to a drawable that will be used to display a text selection
+             anchor on the left side of a selection region. &ndash;&gt;
         <attr name="textSelectHandleLeft" />
-        <!-- Reference to a drawable that will be used to display a text selection
-             anchor on the right side of a selection region. -->
+        &lt;!&ndash; Reference to a drawable that will be used to display a text selection
+             anchor on the right side of a selection region. &ndash;&gt;
         <attr name="textSelectHandleRight" />
-        <!-- Reference to a drawable that will be used to display a text selection
-             anchor for positioning the cursor within text. -->
+        &lt;!&ndash; Reference to a drawable that will be used to display a text selection
+             anchor for positioning the cursor within text. &ndash;&gt;
         <attr name="textSelectHandle" />
-        <!-- Reference to a drawable that will be drawn under the insertion cursor. -->
+        &lt;!&ndash; Reference to a drawable that will be drawn under the insertion cursor. &ndash;&gt;
         <attr name="textCursorDrawable" />
 
-        <!-- Indicates that the content of a non-editable text can be selected. -->
+        &lt;!&ndash; Indicates that the content of a non-editable text can be selected. &ndash;&gt;
         <attr name="textIsSelectable" />
-        <!-- Elegant text height, especially for less compacted complex script text. -->
+        &lt;!&ndash; Elegant text height, especially for less compacted complex script text. &ndash;&gt;
         <attr name="elegantTextHeight" />
-        <!-- Text letter-spacing. -->
-        <attr name="letterSpacing" />
+        &lt;!&ndash; Text letter-spacing. &ndash;&gt;
+        <attr name="letterSpacing" />-->
         <!-- Break strategy (control over paragraph layout). -->
         <attr name="breakStrategy">
             <!-- Line breaking uses simple strategy. -->

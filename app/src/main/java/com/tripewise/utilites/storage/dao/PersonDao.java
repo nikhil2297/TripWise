@@ -17,7 +17,7 @@ public interface PersonDao {
     LiveData<List<PersonData>> getAllData(int tripId);
 
     @Update
-    long updatePersonData(PersonData data);
+    int updatePersonData(PersonData data);
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     long insertPersondata(PersonData data);

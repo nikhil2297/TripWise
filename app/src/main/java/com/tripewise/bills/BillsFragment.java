@@ -96,12 +96,14 @@ public class BillsFragment extends Fragment implements View.OnClickListener {
     }
 
     private void getBillData() {
-        billViewModel.getBillData(getActivity(), BillData.class.getSimpleName(), tripData.getId(), new Observer<Object>() {
+        billViewModel.getBillData(getActivity(), tripData.getId()).observe(getViewLifecycleOwner(), new Observer<List<BillData>>() {
             @Override
-            public void onChanged(Object o) {
-                BillsAdapter adapter = new BillsAdapter(getActivity(), (List<BillData>) o);
+            public void onChanged(List<BillData> billData) {
+                if (billData != null) {
+                    BillsAdapter adapter = new BillsAdapter(getActivity(), billData);
 
-                rvBills.setAdapter(adapter);
+                    rvBills.setAdapter(adapter);
+                }
             }
         });
     }

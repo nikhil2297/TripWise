@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -24,7 +25,6 @@ import com.tripewise.R;
 import com.tripewise.utilites.storage.data.PaymentDetailsData;
 import com.tripewise.utilites.storage.data.PersonData;
 import com.tripewise.utilites.storage.data.TripData;
-import com.tripewise.utilites.storage.tasks.PeopleAsyncConfig;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -55,7 +55,7 @@ public class PeopleDetailFragment extends Fragment {
 
     private List<TravellerItemObject> finalPeopleList;
 
-    private PeopleAsyncConfig asyncConfig;
+    private PeopleViewModel viewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -98,6 +98,8 @@ public class PeopleDetailFragment extends Fragment {
     }
 
     private void init() {
+        viewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(PeopleViewModel.class);
+
         tvTripName.setText(tripData.getTripName());
 
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
@@ -107,8 +109,6 @@ public class PeopleDetailFragment extends Fragment {
         itemDecoration.setDrawable(getResources().getDrawable(R.drawable.recycler_view_divider));
 
         rvPeople.addItemDecoration(itemDecoration);
-
-        asyncConfig = new PeopleAsyncConfig(getActivity());
 
         finalPeopleList = new ArrayList<>();
 
@@ -123,16 +123,18 @@ public class PeopleDetailFragment extends Fragment {
     }
 
     private void getPersonData() {
-        asyncConfig.getPersonData(tripData.getId()).observe(getViewLifecycleOwner(), new Observer<List<PersonData>>() {
+        viewModel.fetchPersonDetails(getActivity(), tripData.getId()).observe(getViewLifecycleOwner(), new Observer<List<PersonData>>() {
             @Override
             public void onChanged(List<PersonData> personDataList) {
-                PeopleDetailsAdapter adapter = new PeopleDetailsAdapter(getActivity(), sortPersonData(personDataList));
+                if (personDataList != null) {
+                    PeopleDetailsAdapter adapter = new PeopleDetailsAdapter(getActivity(), sortPersonData(personDataList));
 
-                rvPeople.setAdapter(adapter);
+                    rvPeople.setAdapter(adapter);
 
-                for (PersonData data : personDataList) {
-                    if (data.getMobileNumber().equals(mobileNumber)) {
-                        setUpPersonData(data);
+                    for (PersonData data : personDataList) {
+                        if (data.getMobileNumber().equals(mobileNumber)) {
+                            setUpPersonData(data);
+                        }
                     }
                 }
             }

@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
@@ -20,13 +21,12 @@ import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.chip.ChipGroup;
 import com.tripewise.R;
+import com.tripewise.people.PeopleViewModel;
 import com.tripewise.utilites.CustomEditText;
 import com.tripewise.utilites.Util;
 import com.tripewise.utilites.storage.data.PaymentDetailsData;
 import com.tripewise.utilites.storage.data.PersonData;
 import com.tripewise.utilites.storage.data.TripData;
-import com.tripewise.utilites.storage.tasks.PeopleAsyncConfig;
-import com.tripewise.utilites.storage.tasks.TripAsyncConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,7 +55,8 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
 
     private ImageView ivBack;
 
-    private TripAsyncConfig asyncConfig;
+    private TripViewModel tripViewModel;
+    private PeopleViewModel peopleViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -89,7 +90,8 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
     }
 
     private void init() {
-        asyncConfig = new TripAsyncConfig(getActivity());
+        tripViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(TripViewModel.class);
+        peopleViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(PeopleViewModel.class);
 
         memberName = new ArrayList<>();
 
@@ -139,7 +141,7 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
                  * 1. TripName
                  * 2. Memeber list
                  * 3. Member count
-                  */
+                 */
                 if (isMember && isTripName) {
                     TripData data = new TripData();
                     data.setTripName(etTripName.getText().toString());
@@ -147,11 +149,7 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
                     data.setMemberCount(memberName.size());
                     data.setGifPath(Util.createGif());
 
-                    try {
-                        asyncConfig.insertTripData(data);
-                    } catch (ExecutionException | InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                    tripViewModel.insertTrip(getActivity(), data);
 
                     //After inserting trip data in Trip table we also add all the traveller in Person table
                     updatePeopleData();
@@ -187,8 +185,8 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
         }
 
         try {
-            new PeopleAsyncConfig(getActivity()).insertPersonDetails(personData);
-        } catch (ExecutionException | InterruptedException e) {
+            peopleViewModel.insertPersonDetails(getActivity(), personData);
+        } catch (Exception e) {
             e.printStackTrace();
         } finally {
             controller.popBackStack();
@@ -358,7 +356,8 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
 
     /**
      * This method is only called in TravellerDialogPop to check the validation
-     * @param isName Traveller name length should be greater then 2
+     *
+     * @param isName   Traveller name length should be greater then 2
      * @param isNumber Traveller number should be 10 digit
      * @return true if all condition satisfy
      */
@@ -368,6 +367,7 @@ public class AddTripFragment extends Fragment implements View.OnClickListener, C
 
     /**
      * This method is only used in TravellerDialogPop to check the entered traveller number is not same
+     *
      * @param mobileNumber should not be same
      * @return true if condition satisfy
      */

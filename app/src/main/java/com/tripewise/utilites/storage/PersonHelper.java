@@ -1,4 +1,4 @@
-package com.tripewise.utilites.storage.tasks;
+package com.tripewise.utilites.storage;
 
 import android.util.Log;
 
@@ -10,13 +10,13 @@ import com.tripewise.utilites.storage.data.PersonData;
 import java.util.ArrayList;
 import java.util.List;
 
-class PersonHelper {
+public class PersonHelper {
     private final String TAG = this.getClass().getSimpleName();
     private BillData billData;
 
     private List<PersonData> personData;
 
-    PersonHelper(BillData billData, List<PersonData> personData) {
+    public PersonHelper(BillData billData, List<PersonData> personData) {
         this.billData = billData;
         this.personData = personData;
     }
@@ -31,7 +31,7 @@ class PersonHelper {
      *
      * @return updated person list
      */
-    List<PersonData> initPersonData() {
+    public List<PersonData> initPersonData() {
 
         getPaidPeopleData();
 

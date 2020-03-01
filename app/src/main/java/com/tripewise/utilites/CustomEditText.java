@@ -161,18 +161,18 @@ public class CustomEditText extends TextInputLayout implements TextWatcher, Text
             text = ta.getString(R.styleable.CustomEditText_text);
             hint = ta.getString(R.styleable.CustomEditText_hint);
             textColor = ta.getColor(R.styleable.CustomEditText_textColor, textColor);
-            textColorLink = ta.getColor(R.styleable.CustomEditText_textColorLink, textColorLink);
+          //  textColorLink = ta.getColor(R.styleable.CustomEditText_textColorLink, textColorLink);
             textHighlightColor = ta.getColor(R.styleable.CustomEditText_textColorHighlight, textHighlightColor);
             textSize = (ta.getDimension(R.styleable.CustomEditText_textSize, textSize)) / getResources().getDisplayMetrics().scaledDensity;
-            textIsSelectable = ta.getBoolean(R.styleable.CustomEditText_textIsSelectable, false);
-            textLetterSpacing = ta.getInt(R.styleable.CustomEditText_letterSpacing, textLetterSpacing);
+          //  textIsSelectable = ta.getBoolean(R.styleable.CustomEditText_textIsSelectable, false);
+          //  textLetterSpacing = ta.getInt(R.styleable.CustomEditText_letterSpacing, textLetterSpacing);
             maxLines = ta.getInt(R.styleable.CustomEditText_maxLines, maxLines);
             lines = ta.getInt(R.styleable.CustomEditText_lines, minLines);
             minLines = ta.getInt(R.styleable.CustomEditText_minLines, minLines);
             ems = ta.getInt(R.styleable.CustomEditText_ems, ems);
             maxEms = ta.getInt(R.styleable.CustomEditText_maxEms, maxEms);
             minEms = ta.getInt(R.styleable.CustomEditText_minEms, minEms);
-            gravity = ta.getInt(R.styleable.CustomEditText_gravity, gravity);
+          //  gravity = ta.getInt(R.styleable.CustomEditText_gravity, gravity);
             maxLength = ta.getInt(R.styleable.CustomEditText_maxLength, maxLength);
             visibility = ta.getInt(R.styleable.CustomEditText_visibilty, visibility);
             breakStrategy = ta.getInt(R.styleable.CustomEditText_breakStrategy, breakStrategy);
@@ -182,9 +182,9 @@ public class CustomEditText extends TextInputLayout implements TextWatcher, Text
             drawablePadding = ta.getInt(R.styleable.CustomEditText_drawablePadding, drawablePadding);
             extraLineSpacing = ta.getFloat(R.styleable.CustomEditText_lineSpacingExtra, extraLineSpacing);
             marqueeLimit = ta.getInt(R.styleable.CustomEditText_marqueeRepeatLimit, marqueeLimit);
-            shadowDx = ta.getInt(R.styleable.CustomEditText_shadowDx, shadowDx);
-            shadowDy = ta.getInt(R.styleable.CustomEditText_shadowDy, shadowDy);
-            shadowRadius = ta.getInt(R.styleable.CustomEditText_shadowRadius, shadowRadius);
+      //      shadowDx = ta.getInt(R.styleable.CustomEditText_shadowDx, shadowDx);
+      //      shadowDy = ta.getInt(R.styleable.CustomEditText_shadowDy, shadowDy);
+      //      shadowRadius = ta.getInt(R.styleable.CustomEditText_shadowRadius, shadowRadius);
 
             cursorVisible = ta.getBoolean(R.styleable.CustomEditText_cursorVisible, true);
             scrollHorizontally = ta.getBoolean(R.styleable.CustomEditText_scrollHorizontally, true);
@@ -194,13 +194,13 @@ public class CustomEditText extends TextInputLayout implements TextWatcher, Text
             includeFontPadding = ta.getBoolean(R.styleable.CustomEditText_includeFontPadding, false);
             linksClickable = ta.getBoolean(R.styleable.CustomEditText_linksClickable, true);
             freezesText = ta.getBoolean(R.styleable.CustomEditText_freezesText, false);
-            textIsSelectable = ta.getBoolean(R.styleable.CustomEditText_textIsSelectable, true);
-            elegentTextHeight = ta.getBoolean(R.styleable.CustomEditText_elegantTextHeight, false);
+       //     textIsSelectable = ta.getBoolean(R.styleable.CustomEditText_textIsSelectable, true);
+       //     elegentTextHeight = ta.getBoolean(R.styleable.CustomEditText_elegantTextHeight, false);
 
-            textSelectHandle = ta.getInt(R.styleable.CustomEditText_textSelectHandle, textSelectHandle);
-            textSelectHandleLeft = ta.getInt(R.styleable.CustomEditText_textSelectHandleLeft, textSelectHandleLeft);
-            textSelectHandleRight = ta.getInt(R.styleable.CustomEditText_textSelectHandleRight, textSelectHandleRight);
-            shadowColor = ta.getColor(R.styleable.CustomEditText_shadowColor, shadowColor);
+        //    textSelectHandle = ta.getInt(R.styleable.CustomEditText_textSelectHandle, textSelectHandle);
+       //     textSelectHandleLeft = ta.getInt(R.styleable.CustomEditText_textSelectHandleLeft, textSelectHandleLeft);
+      //      textSelectHandleRight = ta.getInt(R.styleable.CustomEditText_textSelectHandleRight, textSelectHandleRight);
+      //      shadowColor = ta.getColor(R.styleable.CustomEditText_shadowColor, shadowColor);
             drawableTop = ta.getDrawable(R.styleable.CustomEditText_drawableTop);
             drawableBottom = ta.getDrawable(R.styleable.CustomEditText_drawableBottom);
             drawableLeft = ta.getDrawable(R.styleable.CustomEditText_drawableLeft);

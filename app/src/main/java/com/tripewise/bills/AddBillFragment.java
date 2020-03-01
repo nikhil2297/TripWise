@@ -29,8 +29,6 @@ import com.tripewise.utilites.CustomEditText;
 import com.tripewise.utilites.storage.data.BillData;
 import com.tripewise.utilites.storage.data.PersonData;
 import com.tripewise.utilites.storage.data.TripData;
-import com.tripewise.utilites.storage.tasks.BillAsyncConfig;
-import com.tripewise.utilites.storage.tasks.PeopleAsyncConfig;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -116,10 +114,10 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     }
 
     private void addPeople() {
-        peopleViewModel.fetchPersonDetails(getActivity(), PersonData.class, tripData.getId(), new Observer<Object>() {
+        peopleViewModel.fetchPersonDetails(getActivity(), tripData.getId()).observe(getViewLifecycleOwner(), new Observer<List<PersonData>>() {
             @Override
-            public void onChanged(Object o) {
-                personDataList = (List<PersonData>) o;
+            public void onChanged(List<PersonData> personData) {
+                personDataList = personData;
 
                 for (PersonData data : personDataList) {
                     billPayerChip.addView(createPaidPeopleView(billPayerChip, data));
@@ -159,7 +157,7 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
                     //Add Bill data to Bill Table
                     insertBillData(billData);
                     //Sort the receiving data and sending data of Person Table
-
+                    insertPersonData(billData);
                 }
                 break;
             case R.id.iv_back:
@@ -168,12 +166,13 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void insertBillData(BillData billData){
-        billViewModel.insertBillData(getActivity(), BillData.class.getSimpleName(), billData);
+    private void insertBillData(BillData billData) {
+        billViewModel.insertBillData(getActivity(), billData);
     }
 
-    private void insertPersonData(){
-
+    private void insertPersonData(BillData data) {
+        peopleViewModel.updatePersonDetails(getActivity(), data, personDataList);
+        controller.popBackStack();
     }
 
     /**
@@ -419,6 +418,4 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         }
         return newBillPeopleList;
     }
-
-
 }

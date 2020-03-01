@@ -21,5 +21,5 @@ public interface BillDao {
     long insertBilldata(BillData data);
 
     @Update
-    long updateBillDataData(BillData data);
+    int updateBillDataData(BillData data);
 }

@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -21,7 +22,6 @@ import com.google.gson.Gson;
 import com.tripewise.R;
 import com.tripewise.utilites.storage.data.PersonData;
 import com.tripewise.utilites.storage.data.TripData;
-import com.tripewise.utilites.storage.tasks.PeopleAsyncConfig;
 
 import java.util.List;
 
@@ -30,13 +30,13 @@ public class PeopleFragment extends Fragment {
 
     private TripData tripData;
 
-    private PeopleAsyncConfig peopleConfig;
-
     private RecyclerView rvPeople;
 
     private TextView tvTripName;
 
     private ImageView ivBack;
+
+    private PeopleViewModel viewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,7 +68,9 @@ public class PeopleFragment extends Fragment {
         init();
     }
 
-    private void init(){
+    private void init() {
+        viewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(PeopleViewModel.class);
+
         tvTripName.setText(tripData.getTripName());
 
         LinearLayoutManager manager = new LinearLayoutManager(getActivity());
@@ -78,8 +80,6 @@ public class PeopleFragment extends Fragment {
         itemDecoration.setDrawable(getResources().getDrawable(R.drawable.recycler_view_divider));
 
         rvPeople.addItemDecoration(itemDecoration);
-
-        peopleConfig = new PeopleAsyncConfig(getActivity());
 
         ivBack.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -91,19 +91,21 @@ public class PeopleFragment extends Fragment {
         createPeopleList();
     }
 
-    private void createPeopleList(){
-        peopleConfig.getPersonData(tripData.getId()).observe(getViewLifecycleOwner(), new Observer<List<PersonData>>() {
+    private void createPeopleList() {
+        viewModel.fetchPersonDetails(getActivity(), tripData.getId()).observe(getViewLifecycleOwner(), new Observer<List<PersonData>>() {
             @Override
             public void onChanged(List<PersonData> personData) {
-                PeopleAdapter adapter = PeopleAdapter.newInstance(getActivity(), personData, new PeopleAdapter.PeopleAdapterListener() {
-                    @Override
-                    public void onPersonClick(PersonData personData) {
-                        PeopleFragmentDirections.ActionPeopleFragmentToPeopleDetailFragment direction = PeopleFragmentDirections.actionPeopleFragmentToPeopleDetailFragment(personData.getMobileNumber(), new Gson().toJson(tripData).toString());
-                        controller.navigate(direction);
-                    }
-                });
+                if (personData != null) {
+                    PeopleAdapter adapter = PeopleAdapter.newInstance(getActivity(), personData, new PeopleAdapter.PeopleAdapterListener() {
+                        @Override
+                        public void onPersonClick(PersonData personData) {
+                            PeopleFragmentDirections.ActionPeopleFragmentToPeopleDetailFragment direction = PeopleFragmentDirections.actionPeopleFragmentToPeopleDetailFragment(personData.getMobileNumber(), new Gson().toJson(tripData).toString());
+                            controller.navigate(direction);
+                        }
+                    });
 
-                rvPeople.setAdapter(adapter);
+                    rvPeople.setAdapter(adapter);
+                }
             }
         });
     }
