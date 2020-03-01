@@ -1,52 +1,56 @@
 package com.tripewise.bills;
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
+import android.app.Dialog;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.DatePicker;
-import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.card.MaterialCardView;
+import com.google.android.material.chip.ChipGroup;
 import com.google.gson.Gson;
 import com.tripewise.R;
-import com.tripewise.utilites.Util;
+import com.tripewise.people.PeopleViewModel;
+import com.tripewise.utilites.CustomEditText;
 import com.tripewise.utilites.storage.data.BillData;
+import com.tripewise.utilites.storage.data.PersonData;
 import com.tripewise.utilites.storage.data.TripData;
-import com.tripewise.utilites.storage.tasks.BillAsyncConfig;
-import com.tripewise.utilites.storage.tasks.PeopleAsyncConfig;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class AddBillFragment extends Fragment implements View.OnClickListener {
     private TripData tripData;
 
-    private EditText etBillName;
-    private TextView etBillDate;
-    private TextView etBillTime;
-    private TextView etBillPaidPeople;
-    private TextView etBillPeople;
-    private EditText etBillAmount;
+    private CustomEditText etBillName;
+    private CustomEditText etBillAmount;
 
-    private Button btSave;
-    private Button btCancel;
+    private MaterialButton btCreate;
 
-    private int[] date = new int[3];
-    private int[] time = new int[2];
+    private ChipGroup billPayerChip;
+    private ChipGroup billPeopleChip;
+
+    private ImageView ivBack;
+
+    private NavController controller;
+
+    private List<PersonData> personDataList;
 
     private ArrayList<BillData.BillPeople> billPeopleList;
     private ArrayList<BillData.BillPeople> paidPeopleList;
@@ -54,14 +58,9 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     private ArrayList<BillData.BillPeople> finalBillPeopleList;
     private ArrayList<BillData.BillPeople> finalPaidPeopleList;
 
-    private PeopleAsyncConfig peopleAsyncConfig;
+    private PeopleViewModel peopleViewModel;
 
-    private BillAsyncConfig billAsyncConfig;
-
-    private boolean isBillName;
-    private boolean isBillDate;
-    private boolean isBillPaidPeople;
-    private boolean isBillAmount;
+    private BillViewModel billViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -81,266 +80,342 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        controller = NavHostFragment.findNavController(this);
+
         etBillName = view.findViewById(R.id.et_bill_name);
         etBillAmount = view.findViewById(R.id.et_amount);
-        etBillDate = view.findViewById(R.id.et_date);
-        etBillTime = view.findViewById(R.id.et_time);
-        etBillPaidPeople = view.findViewById(R.id.et_paid_people);
-        etBillPeople = view.findViewById(R.id.et_people_list);
 
-        btSave = view.findViewById(R.id.bt_save);
-        btCancel = view.findViewById(R.id.bt_cancel);
+        btCreate = view.findViewById(R.id.bt_create);
+
+        billPayerChip = view.findViewById(R.id.chip_bill_payer);
+        billPeopleChip = view.findViewById(R.id.chip_bill_people);
+
+        ivBack = view.findViewById(R.id.iv_back);
 
         init();
     }
 
     private void init() {
-        billAsyncConfig = new BillAsyncConfig(getActivity());
+        billViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(BillViewModel.class);
 
-        peopleAsyncConfig = new PeopleAsyncConfig(getActivity());
+        peopleViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(PeopleViewModel.class);
 
         finalBillPeopleList = new ArrayList<>();
         finalPaidPeopleList = new ArrayList<>();
 
-        etBillDate.setOnClickListener(this);
-        etBillTime.setOnClickListener(this);
-        etBillPeople.setOnClickListener(this);
-        etBillPaidPeople.setOnClickListener(this);
+        billPeopleList = new ArrayList<>();
+        paidPeopleList = new ArrayList<>();
 
-        btSave.setOnClickListener(this);
-        btCancel.setOnClickListener(this);
+        btCreate.setOnClickListener(this);
+        ivBack.setOnClickListener(this);
 
-        setupDate();
-        setUpTime();
+        //Add all the travellers in both of the chip group
+        addPeople();
     }
 
-    private void setupDate() {
-        Calendar calendar = Calendar.getInstance();
+    private void addPeople() {
+        peopleViewModel.fetchPersonDetails(getActivity(), tripData.getId()).observe(getViewLifecycleOwner(), new Observer<List<PersonData>>() {
+            @Override
+            public void onChanged(List<PersonData> personData) {
+                personDataList = personData;
 
-        date[0] = calendar.get(Calendar.DAY_OF_MONTH);
-        date[1] = calendar.get(Calendar.MONTH);
-        date[2] = calendar.get(Calendar.YEAR);
+                for (PersonData data : personDataList) {
+                    billPayerChip.addView(createPaidPeopleView(billPayerChip, data));
+
+                    billPeopleChip.addView(createBillPeopleView(billPeopleChip, data));
+
+                    setBillPeople(false, data);
+                }
+            }
+        });
     }
 
-    private void setUpTime() {
-        Calendar calendar = Calendar.getInstance();
-
-        time[0] = calendar.get(Calendar.HOUR_OF_DAY);
-        time[1] = calendar.get(Calendar.MINUTE);
-    }
-
+    /**
+     * BillName char length should be grater then 1
+     * BillPaidPeople as there should at least on traveller who paid the bill
+     * BillAmount should be there
+     *
+     * @return true if all condition satisfy else false
+     */
     private boolean validation() {
-        boolean isValid = false;
+        boolean isBillName = etBillName.getText().toString().length() > 1;
 
-        if (etBillName.getText().toString().length() > 1) {
-            isValid = true;
-        } else {
-            isValid = false;
-        }
+        boolean isBillPaidPeople = finalPaidPeopleList.size() > 0;
 
-        if (Util.validateFormat(etBillDate.getText().toString())) {
-            isValid = true;
-        } else {
-            isValid = false;
-        }
+        boolean isBillAmount = etBillAmount.getText().toString().length() > 1;
 
-        if (finalPaidPeopleList.size() > 0) {
-            isValid = true;
-        } else {
-            isValid = false;
-        }
-
-        if (etBillAmount.getText().toString().length() > 1) {
-            isValid = true;
-        } else {
-            isValid = false;
-        }
-
-        return isValid;
+        return isBillAmount && isBillName && isBillPaidPeople;
     }
 
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-            case R.id.et_date:
-                createDatePicker();
-                break;
-            case R.id.et_time:
-                createTimePicker();
-                break;
-            case R.id.et_paid_people:
-                showPaidPeopleList();
-                break;
-            case R.id.et_people_list:
-                showBillPeopleList();
-                break;
-            case R.id.bt_save:
+            case R.id.bt_create:
                 if (validation()) {
                     BillData billData = createBillData();
-                    try {
-                        billAsyncConfig.insertBillData(billData);
-                    } catch (ExecutionException | InterruptedException e) {
-                        e.printStackTrace();
-                    }finally {
-                        try {
-                            peopleAsyncConfig.updatePersonData(billData);
-                        } catch (ExecutionException | InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
+
+                    //Add Bill data to Bill Table
+                    insertBillData(billData);
+                    //Sort the receiving data and sending data of Person Table
+                    insertPersonData(billData);
                 }
                 break;
-            case R.id.bt_cancel:
+            case R.id.iv_back:
+                controller.popBackStack();
                 break;
         }
     }
 
-    private void showPaidPeopleList() {
-        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-
-        PeopleListDialogFragment dialogFragment = PeopleListDialogFragment.newInstance(createPaidPeopleList(), true, new PeopleListDialogFragment.PeopleListListener() {
-            @Override
-            public void onBillDataChange(ArrayList<BillData.BillPeople> billPeople, String name) {
-                finalPaidPeopleList = billPeople;
-
-                updatePaidPeopleList();
-
-                etBillPaidPeople.setText(name);
-                Log.d("AddBillFragment : ", String.valueOf(finalPaidPeopleList.size()));
-            }
-        });
-
-        dialogFragment.show(fragmentTransaction, "paid-people-list");
+    private void insertBillData(BillData billData) {
+        billViewModel.insertBillData(getActivity(), billData);
     }
 
-    private void showBillPeopleList() {
-        FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
+    private void insertPersonData(BillData data) {
+        peopleViewModel.updatePersonDetails(getActivity(), data, personDataList);
+        controller.popBackStack();
+    }
 
-        PeopleListDialogFragment dialogFragment = PeopleListDialogFragment.newInstance(createBillPeopleList(), false, new PeopleListDialogFragment.PeopleListListener() {
+    /**
+     * @param chipGroup = Is only used as parent view
+     * @param data      = Traveller detail eg. Name, Chip color, mobile number
+     * @return = A view that we want to add in chipgroup
+     */
+    private View createPaidPeopleView(ChipGroup chipGroup, final PersonData data) {
+        final View chipView = LayoutInflater.from(getActivity()).inflate(R.layout.layout_traveller_big_chip, (ViewGroup) chipGroup.getParent(), false);
+
+        final ConstraintLayout layoutChip = chipView.findViewById(R.id.layout_chip);
+
+        final MaterialCardView chipCardView = chipView.findViewById(R.id.materialCardView);
+
+        final TextView tvName = layoutChip.findViewById(R.id.tv_chip_name);
+
+        TextView tvFullName = layoutChip.findViewById(R.id.tv_chip_full_name);
+
+        tvFullName.setText(data.getPersonName());
+        tvName.setText(data.getPersonName().substring(0, 2).toUpperCase());
+        tvName.setTextColor(Color.BLACK);
+
+        setUnCheckChip(chipCardView, data);
+
+        //Switch type chipView for selected state and unselected state works for the TextView too
+        layoutChip.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onBillDataChange(ArrayList<BillData.BillPeople> billPeople, String name) {
-                finalBillPeopleList = billPeople;
+            public void onClick(View v) {
+                if (chipCardView.getCardBackgroundColor().getDefaultColor() == Color.WHITE) {
+                     /*
+                       1. We select a traveller
+                       2. Then show a amount popup
+                       3. If the user enter the amount and hit the save button then traveller chip is assumed as selected or else stays in unselected state
+                      */
+                    createAmountPopUp(chipCardView, data, tvName);
+                } else {
+                    setUnCheckChip(chipCardView, data);
 
-                if (!name.equals(null)) {
-                    etBillPeople.setText(name);
+                    setPaidBillPeople(true, 0, data);
+
+                    tvName.setTextColor(Color.BLACK);
                 }
-                Log.d("AddBillFragment : ", String.valueOf(finalBillPeopleList.size()));
             }
         });
 
-        dialogFragment.show(fragmentTransaction, "bill-people-list");
+        return chipView;
     }
 
-    private void updatePaidPeopleList() {
-        for (int i = 0 ; i < finalPaidPeopleList.size(); i++){
-            BillData.BillPeople billPeople = finalPaidPeopleList.get(i);
+    /**
+     * @param chipGroup = Is only used as parent view
+     * @param data      = Traveller detail eg. Name, Chip color, mobile number
+     * @return = A view that we want to add in chipgroup
+     */
+    private View createBillPeopleView(ChipGroup chipGroup, final PersonData data) {
+        final View view = LayoutInflater.from(getActivity()).inflate(R.layout.layout_traveller_big_chip, (ViewGroup) chipGroup.getParent(), false);
 
-            paidPeopleList.get(i).setCheck(billPeople.isCheck());
-            paidPeopleList.get(i).setAmount(billPeople.getAmount());
+        final ConstraintLayout layoutChip = view.findViewById(R.id.layout_chip);
+
+        final MaterialCardView chipCardView = view.findViewById(R.id.materialCardView);
+
+        final TextView tvName = layoutChip.findViewById(R.id.tv_chip_name);
+
+        TextView tvFullName = layoutChip.findViewById(R.id.tv_chip_full_name);
+
+        tvFullName.setText(data.getPersonName());
+        tvFullName.setVisibility(View.VISIBLE);
+        tvName.setText(data.getPersonName().substring(0, 2).toUpperCase());
+
+        setCheckedChip(chipCardView, data);
+
+        //Switch type chipView for selected state and unselected state works for the TextView too
+        layoutChip.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (chipCardView.getCardBackgroundColor().getDefaultColor() == Color.WHITE) {
+                    setCheckedChip(chipCardView, data);
+                    tvName.setTextColor(Color.WHITE);
+
+                    setBillPeople(false, data);
+                } else {
+                    setUnCheckChip(chipCardView, data);
+                    tvName.setTextColor(Color.BLACK);
+
+                    setBillPeople(true, data);
+                }
+            }
+        });
+
+        return view;
+    }
+
+    /**
+     * @param isRemove = if its true then we remove for the billPeople array list else we add into it.
+     * @param data     = Traveller details used for adding billPeople into array list or comparing using mobile number to remove it.
+     */
+    private void setBillPeople(boolean isRemove, PersonData data) {
+        if (!isRemove) {
+            BillData.BillPeople people = new BillData.BillPeople();
+            people.setPeopleName(data.getPersonName());
+            people.setPeopleNumber(data.getMobileNumber());
+            people.setPeopleColor(data.getPersonColor());
+
+            billPeopleList.add(people);
+        } else {
+            Iterator<BillData.BillPeople> iterator = billPeopleList.listIterator();
+            while (iterator.hasNext()) {
+                if (iterator.next().getPeopleNumber().equals(data.getMobileNumber())) {
+                    iterator.remove();
+                }
+            }
         }
+
+        finalBillPeopleList = billPeopleList;
+
+        Log.d("AddBillFragment", "Bill People List size : " + billPeopleList.size());
     }
 
-    private void createTimePicker() {
-        TimePickerDialog pickerDialog = new TimePickerDialog(getActivity(), new TimePickerDialog.OnTimeSetListener() {
-            @Override
-            public void onTimeSet(TimePicker timePicker, int i, int i1) {
-                time[0] = i;
-                time[1] = i1;
+    /**
+     * @param isRemove = If its true then we remove entry form the paidBillPeople array list else we add into it.
+     * @param amount   = Its the amount paid by the traveller for the current build and also use to add data its data.
+     * @param data     = Traveller details used for adding data in paidBillPeople array list or comparing using mobile number to remove it.
+     */
+    private void setPaidBillPeople(boolean isRemove, long amount, PersonData data) {
+        if (!isRemove) {
+            BillData.BillPeople people = new BillData.BillPeople();
+            people.setAmount(amount);
+            people.setPeopleNumber(data.getMobileNumber());
+            people.setPeopleName(data.getPersonName());
+            people.setPeopleColor(data.getPersonColor());
 
-                etBillTime.setText(i + ":" + i1);
+            paidPeopleList.add(people);
+        } else {
+            Iterator<BillData.BillPeople> iterator = paidPeopleList.listIterator();
+            while (iterator.hasNext()) {
+                if (iterator.next().getPeopleNumber().equals(data.getMobileNumber())) {
+                    iterator.remove();
+                }
             }
-        }, time[0], time[1], true);
+        }
 
-        pickerDialog.show();
+        finalPaidPeopleList = paidPeopleList;
     }
 
-    private void createDatePicker() {
-        DatePickerDialog pickerDialog = new DatePickerDialog(getActivity(), new DatePickerDialog.OnDateSetListener() {
+    /**
+     * @param cardView   = This view is used to pass as a parameter to change its state into checked state
+     * @param personData = Traveller details eg: Name, Person chip color etc. Its also pass as a parameter;
+     * @param tvName     = As our chipView is a parent view and its is initialize as a local variable and all its childview are also local variable.
+     *                   We also change the state the textView inside ChipView. So in above given condition on line number 198. We require tvName to change its state.
+     */
+    private void createAmountPopUp(final MaterialCardView cardView, final PersonData personData, final TextView tvName) {
+        final Dialog dialog = new Dialog(getActivity());
+        dialog.setContentView(R.layout.layout_bill_amount_dialog);
+
+        final MaterialCardView chipCardView = dialog.findViewById(R.id.materialCardView);
+
+        TextView tvChipName = dialog.findViewById(R.id.tv_chip_name);
+
+        final CustomEditText etAmount = dialog.findViewById(R.id.tv_amount_paid);
+        CustomEditText etName = dialog.findViewById(R.id.et_traveller_name);
+
+        final MaterialButton btSave = dialog.findViewById(R.id.bt_save);
+
+        tvChipName.setText(personData.getPersonName().substring(0, 2).toUpperCase());
+
+        etName.setText(personData.getPersonName());
+
+        chipCardView.setCardBackgroundColor(personData.getPersonColor());
+
+        etAmount.addOnTextChangeListener(new CustomEditText.OnTextChangeListener() {
             @Override
-            public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
-                Log.d("AddBillFragment", "Date picker : " + i + " " + i1 + 1 + " " + i2);
-
-                date[0] = i2;
-                date[1] = i1;
-                date[2] = i;
-
-                etBillDate.setText(i2 + " " + i1 + 1 + " " + i);
+            public void onTextChange(CharSequence s, int start, int before, int count) {
+                btSave.setEnabled(s.length() > 0);
             }
-        }, date[2], date[1], date[0]);
+        });
 
-        pickerDialog.show();
+        btSave.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setPaidBillPeople(false, Long.parseLong(etAmount.getText()), personData);
+
+                setCheckedChip(cardView, personData);
+
+                tvName.setTextColor(Color.WHITE);
+
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 
+    /**
+     * @param checkedChip = Change its background color and remove the stroke so the user can see its selected
+     * @param data        = Use to get background color
+     */
+    private void setCheckedChip(MaterialCardView checkedChip, PersonData data) {
+        checkedChip.setCardBackgroundColor(data.getPersonColor());
+        checkedChip.setStrokeWidth(0);
+        checkedChip.setStrokeColor(Color.TRANSPARENT);
+    }
+
+    /**
+     * @param unCheckChip = Change its background color and add the stroke so the user can see its unslected
+     * @param data        = not used for now
+     */
+    private void setUnCheckChip(MaterialCardView unCheckChip, PersonData data) {
+        unCheckChip.setCardBackgroundColor(Color.WHITE);
+        unCheckChip.setStrokeWidth(1);
+        unCheckChip.setStrokeColor(Color.BLACK);
+    }
+
+    //We create a BillData that with bill Name, Amount, Trip id, paidPeople list, bill people list.
     private BillData createBillData() {
         BillData data = new BillData();
         data.setBillName(etBillName.getText().toString());
-        data.setBillAmount(Integer.parseInt(etBillAmount.getText().toString()));
-        data.setBillTime(Util.dateToMilli(createDate()));
-        data.setBillTimeString(createDate());
+        data.setBillAmount(Long.parseLong(etBillAmount.getText().toString()));
         data.setTripId(tripData.getId());
         data.setBillPaidPeopleList(finalPaidPeopleList);
-        data.setBillPeopleList(createFinalBillPeopleList());
+        data.setBillPeopleList(sortBillPeople(finalBillPeopleList));
 
         return data;
     }
 
-    private String createDate() {
-        if (!etBillTime.getText().toString().equals(null)) {
-            return etBillDate.getText().toString() + " " + etBillTime.getText().toString();
-        } else {
-            return etBillTime.getText().toString() + " " + "00:00";
-        }
-    }
-
-    private ArrayList<BillData.BillPeople> createPaidPeopleList() {
-        if (paidPeopleList == null) {
-            paidPeopleList = new ArrayList<>();
-
-            for (int i = 0; i < tripData.getMemberName().size(); i++) {
-                BillData.BillPeople people = new BillData.BillPeople();
-                people.setPeopleName(tripData.getMemberName().get(i));
-
-                paidPeopleList.add(people);
-            }
-        }
-
-        return paidPeopleList;
-    }
-
-    private ArrayList<BillData.BillPeople> createFinalBillPeopleList() {
-        if (finalBillPeopleList.size() > 0) {
-            return sortBillPeople(finalBillPeopleList);
-        } else {
-            return sortBillPeople(createBillPeopleList());
-        }
-    }
-
+    /*
+     * Step :
+     * 1. Create a PaidPeople data form @finalPaidPeopleList
+     * 2. Create a BillPeople data from @newBIllPeopleList
+     * 3. Compare PaidPeople traveller number with BillPeople traveller number
+     * 4. a) If true then don't set the amount as that will be the traveller who paid for the bill
+     *    b) If false then add the result amount which we get from dividing the total amount paid by the current traveller/Total number of traveller in bill people
+     * 5. After all step is completed then return the @newBillPeopleList
+     * */
     private ArrayList<BillData.BillPeople> sortBillPeople(ArrayList<BillData.BillPeople> newBillPeopleList) {
         for (int i = 0; i < finalPaidPeopleList.size(); i++) {
             BillData.BillPeople paidPeople = finalPaidPeopleList.get(i);
 
             for (int j = 0; j < newBillPeopleList.size(); j++) {
                 BillData.BillPeople billPeople = newBillPeopleList.get(j);
-                if (!paidPeople.getPeopleName().equals(billPeople.getPeopleName())) {
+                if (!paidPeople.getPeopleNumber().equals(billPeople.getPeopleNumber())) {
                     billPeople.setAmount(billPeople.getAmount() + (paidPeople.getAmount() / newBillPeopleList.size()));
                 }
             }
         }
         return newBillPeopleList;
-    }
-
-    private ArrayList<BillData.BillPeople> createBillPeopleList() {
-        if (billPeopleList == null) {
-            billPeopleList = new ArrayList<>();
-
-            for (int i = 0; i < tripData.getMemberName().size(); i++) {
-                BillData.BillPeople people = new BillData.BillPeople();
-                people.setPeopleName(tripData.getMemberName().get(i));
-
-                billPeopleList.add(people);
-            }
-        }
-
-        return billPeopleList;
     }
 }

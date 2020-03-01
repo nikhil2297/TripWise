@@ -13,7 +13,18 @@
         <action
             android:id="@+id/action_tripFragment_to_billsFragment"
             app:destination="@id/billsFragment"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit"
             app:popUpTo="@+id/tripFragment" />
+        <action
+            android:id="@+id/action_tripFragment_to_placeholder"
+            app:destination="@id/placeholder"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:popEnterAnim="@anim/fragment_fade_exit"
+            app:popUpTo="@+id/tripFragment" />
+        <action
+            android:id="@+id/action_tripFragment_to_peopleFragment"
+            app:destination="@id/peopleFragment" />
     </fragment>
     <fragment
         android:id="@+id/billsFragment"
@@ -26,6 +37,8 @@
         <action
             android:id="@+id/action_billsFragment_to_addBillFragment"
             app:destination="@id/addBillFragment"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit"
             app:popUpTo="@+id/billsFragment" />
     </fragment>
     <fragment
@@ -41,5 +54,41 @@
         <action
             android:id="@+id/action_addBillFragment_to_billsFragment"
             app:destination="@id/billsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/placeholder"
+        android:name="com.tripewise.trips.AddTripFragment"
+        tools:layout="@layout/fragment_add_trip">
+
+        <argument
+            android:name="latest_id"
+            app:argType="integer"/>
+
+    </fragment>
+    <fragment
+        android:id="@+id/peopleFragment"
+        android:name="com.tripewise.people.PeopleFragment"
+        android:label="fragment_people"
+        tools:layout="@layout/fragment_people">
+
+        <argument
+            android:name="trip_data"
+            app:argType="string" />
+        <action
+            android:id="@+id/action_peopleFragment_to_peopleDetailFragment"
+            app:destination="@id/peopleDetailFragment"
+            app:popUpTo="@+id/peopleFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/peopleDetailFragment"
+        android:name="com.tripewise.people.PeopleDetailFragment"
+        android:label="fragment_person_details"
+        tools:layout="@layout/fragment_person_details" >
+        <argument
+            android:name="mobileNumber"
+            app:argType="string" />
+        <argument
+            android:name="trip_data"
+            app:argType="string" />
     </fragment>
 </navigation>

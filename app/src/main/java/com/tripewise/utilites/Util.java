@@ -1,9 +1,11 @@
 package com.tripewise.utilites;
 
 import android.content.Context;
-import android.net.Uri;
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 
-import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -47,7 +49,7 @@ public class Util {
     }
 
     public static String createGif() {
-        return "file:///android_asset/gif/"+ randomGifName();
+        return "file:///android_asset/gif/" + randomGifName();
     }
 
     private static String randomGifName() {
@@ -61,5 +63,20 @@ public class Util {
         }
 
         return randomGifName();
+    }
+
+    public static int createRandomColor() {
+        Random rnd = new Random();
+        int color = Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256));
+
+        if (color == Color.WHITE || color == Color.BLACK || color == Color.TRANSPARENT) {
+            return createRandomColor();
+        } else {
+            return color;
+        }
+    }
+
+    public static float convertPixelToDp(){
+        return (Resources.getSystem().getDisplayMetrics().widthPixels / Resources.getSystem().getDisplayMetrics().density);
     }
 }

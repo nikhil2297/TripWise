@@ -4,7 +4,6 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebView;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.TextView;
 
@@ -86,9 +85,12 @@ public class TripsAdapter extends BaseExpandableListAdapter {
         holder.tvTripData.setText(context.getResources().getString(R.string.trip_people, tripData.get(i).getMemberCount(), tripData.get(i).getBillCount()));
         holder.tvTripName.setText(tripData.get(i).getTripName());
 
+        /*
+        Load gif in webview slow down app
         holder.webGif.loadUrl(tripData.get(i).getGifPath());
         holder.webGif.getSettings().setLoadWithOverviewMode(true);
         holder.webGif.getSettings().setUseWideViewPort(true);
+        */
 
         return view;
     }
@@ -145,7 +147,7 @@ public class TripsAdapter extends BaseExpandableListAdapter {
 
         ConstraintLayout tripDetailsLayout;
 
-        WebView webGif;
+        // WebView webGif;
 
         ParentItemHolder(View view) {
             tvTripName = view.findViewById(R.id.tv_trip_name);
@@ -155,9 +157,9 @@ public class TripsAdapter extends BaseExpandableListAdapter {
 
             tripDetailsLayout = view.findViewById(R.id.parent);
 
-            webGif = view.findViewById(R.id.gif_web);
+            //      webGif = view.findViewById(R.id.gif_web);
 
-            webGif.setClickable(true);
+            //     webGif.setClickable(true);
 
         }
     }
