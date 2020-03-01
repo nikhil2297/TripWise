@@ -1,5 +1,5 @@
 # TripWise
-This is a mini college project
+This is a college mini project
 
 TripWise is calculating expenses of a trip and dividing it into following members.
 This app is for those groups which are not good in handling bills and final calculation 
@@ -23,7 +23,7 @@ And made in such a way that further we can also add HTTP type in it
 
 :heavy_check_mark: MVVM architecture
 
-:heavy_check_mark: Proper UI
+:heavy_check_mark: Material Design
 
 :soon: Edting Bills
 
