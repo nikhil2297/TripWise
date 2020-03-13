@@ -97,9 +97,9 @@ public class DbAsyncConfig {
         rowId = new UpdateDbOperation().execute(objects).get();
 
         if (rowId > 0){
-            Log.e(TAG, "UpdateDbOperation : " + "Updated with new data in table " + objects[0].getClass().getSimpleName());
+            Log.e(TAG, "UpdateDbOperation : " + "Updated with new data in table " + objects[0]);
         }else {
-            Log.e(TAG, "InsertDbOperation : " + "Error in updating new data in table " + objects[0].getClass().getSimpleName());
+            Log.e(TAG, "UpdateDbOperation : " + "Error in updating new data in table " + objects[0]);
         }
 
         return rowId;
@@ -108,7 +108,7 @@ public class DbAsyncConfig {
     private long updatePersonData(BillData billData, List<PersonData> personData) throws ExecutionException, InterruptedException {
         long rowId = -1;
 
-        PersonHelper helper = new PersonHelper(billData, personData);
+        PersonHelper helper = new PersonHelper(billData, personData, 1);
         //New PersonData list
         List<PersonData> mainPersonList = helper.initPersonData();
 
@@ -129,9 +129,9 @@ public class DbAsyncConfig {
             if (objects[0].equals(BillData.class.getSimpleName())) {
                 BillData data = (BillData) objects[1];
 
-                rowId = storage.billDao().updateBillDataData(data);
+                rowId = storage.billDao().updateBillDataData(data.getId(), data.getBillName(), data.getBillAmount(), data.getBillPaidPeopleList(), data.getBillPeopleList());
             } else if (objects[0].equals(PersonData.class.getSimpleName())) {
-                PersonHelper helper = new PersonHelper((BillData) objects[1], (List<PersonData>) objects[2]);
+                PersonHelper helper = new PersonHelper((BillData) objects[1], (List<PersonData>) objects[2], (Integer) objects[3]);
                 //New PersonData list
                 List<PersonData> mainPersonList = helper.initPersonData();
 
@@ -148,18 +148,12 @@ public class DbAsyncConfig {
         //Default id
         long rowId = -1;
 
-        if (objects[0].equals(TripData.class.getSimpleName())) {
-            rowId = new DeleteDbOperation().execute(objects).get();
-        } else if (objects[0].equals(BillData.class.getSimpleName())) {
-            rowId = new DeleteDbOperation().execute(objects).get();
-        } else {
-            rowId = new DeleteDbOperation().execute(objects).get();
-        }
+        rowId = new DeleteDbOperation().execute(objects).get();
 
         if (rowId > 0){
-            Log.e(TAG, "UpdateDbOperation : " + "Deleted the data in table " + objects[0].getClass().getSimpleName());
+            Log.e(TAG, "DeleteDbOperation : " + "Deleted the data in table " + objects[0]);
         }else {
-            Log.e(TAG, "InsertDbOperation : " + "Error in deleting data in table " + objects[0].getClass().getSimpleName());
+            Log.e(TAG, "DeleteDbOperation : " + "Error in deleting data in table " + objects[0]);
         }
 
         return rowId;
@@ -172,15 +166,15 @@ public class DbAsyncConfig {
             //Default row id
             long rowId = -1;
 
-            if (objects[1].getClass().equals(TripData.class)) {
+            if (objects[0].equals(TripData.class.getSimpleName())) {
                 TripData data = (TripData) objects[1];
 
                 rowId = storage.tripDao().deleteTripEntry(data.getId());
-            } /*else if (objects[0].getClass().equals(BillData.class)) {
-                BillData data = (BillData) objects[0];
+            } else if (objects[0].equals(BillData.class.getSimpleName())) {
+                BillData data = (BillData) objects[1];
 
-                rowId = storage.billDao().de(data);
-            }*/
+                rowId = storage.billDao().deleteBillData(data.getId());
+            }
 
             return rowId;
         }

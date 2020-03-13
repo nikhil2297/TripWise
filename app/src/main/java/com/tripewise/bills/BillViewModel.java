@@ -36,4 +36,18 @@ public class BillViewModel extends ViewModel {
         helper.setObject(BillData.class.getSimpleName(), data);
         helper.sendToDestination();
     }
+
+    void updateBillData(Context context, BillData data){
+        CommunicationHelper helper = new CommunicationHelper(context);
+        helper.setActionType(CommunicationConstants.TYPE_UPDATE);
+        helper.setObject(BillData.class.getSimpleName(), data);
+        helper.sendToDestination();
+    }
+
+    void deleteBillData(Context context, BillData data) {
+        CommunicationHelper helper = new CommunicationHelper(context);
+        helper.setActionType(CommunicationConstants.TYPE_DELETE);
+        helper.setObject(BillData.class.getSimpleName(), data);
+        helper.sendToDestination();
+    }
 }

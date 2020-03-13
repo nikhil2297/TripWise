@@ -11,14 +11,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PersonHelper {
+    private final static int ACTION_ADD = 1;
+    private final static int ACTION_DELETE = 2;
+
     private final String TAG = this.getClass().getSimpleName();
     private BillData billData;
 
+    private int actionType;
+
     private List<PersonData> personData;
 
-    public PersonHelper(BillData billData, List<PersonData> personData) {
+    public PersonHelper(BillData billData, List<PersonData> personData, int actionType) {
         this.billData = billData;
         this.personData = personData;
+        this.actionType = actionType;
     }
 
     /**
@@ -47,13 +53,13 @@ public class PersonHelper {
             calculatePaymentDetails(data);
         }
 
-        for (PersonData data : personData) {
+/*        for (PersonData data : personData) {
             getTotalPayingAmount(data);
 
             getTotalReceivingAmount(data);
 
             getTotalPaidAmount(data);
-        }
+        }*/
 
         return personData;
     }
@@ -76,9 +82,9 @@ public class PersonHelper {
         }
     }
 
-    //*********************************************************************//
-    //******************Sort Bill Paid Details block**********************//
-    //*******************************************************************//
+    //********************************************************************************************//
+    //*************************Sort Bill Paid Details block***************************************//
+    //********************************************************************************************//
 
     /**
      * Step :
@@ -105,14 +111,22 @@ public class PersonHelper {
                 detailsDataList = new ArrayList<>();
             }
 
-            PaymentDetailsData.Details details = new PaymentDetailsData.Details();
+            if (actionType == ACTION_ADD) {
+                PaymentDetailsData.Details details = new PaymentDetailsData.Details();
 
-            details.setName(billPeople.getPeopleName());
-            details.setAmount(billPeople.getAmount());
-            details.setBillName(billData.getBillName());
-            details.setMobileNumber(personData.getMobileNumber());
+                details.setName(billPeople.getPeopleName());
+                details.setAmount(billPeople.getAmount());
+                details.setBillName(billData.getBillName());
+                details.setMobileNumber(personData.getMobileNumber());
 
-            detailsDataList.add(details);
+                detailsDataList.add(details);
+            } else if (actionType == ACTION_DELETE && !detailsDataList.isEmpty()) {
+                for (PaymentDetailsData.Details details : detailsDataList) {
+                    if (details.getBillName().equals(billData.getBillName())) {
+                        detailsDataList.remove(details);
+                    }
+                }
+            }
 
             detailsData.setPaidDetails(detailsDataList);
 
@@ -120,20 +134,20 @@ public class PersonHelper {
         }
     }
 
-    //*********************************************************************//
-    //******************Sort Amount Receive Details block*****************//
-    //*******************************************************************//
+    //********************************************************************************************//
+    //****************************Sort Amount Receive Details block*******************************//
+    //********************************************************************************************//
 
     /**
      * Step:
      * 1. Null check for person data and Person paid details data
      * 2. Create a array list of person receive details data
      * 3. Then we create a loop for bill paid people list and check that the person data mobile is available in bill paid people.
-     *      3.1 If false then we just the set the current array list which created in step 2 as receive details for the specific person
-     *      3.2 If true then we create loop of receiving people list size so that we can update all the receiving amount
+     * 3.1 If false then we just the set the current array list which created in step 2 as receive details for the specific person
+     * 3.2 If true then we create loop of receiving people list size so that we can update all the receiving amount
      * 4. We also create a billPeople list to check the receiving amount we want to update of the people are include in the bill or not
-     *      4.1 If false then we just the set the current array list which created in step 2 as receive details for the specific person
-     *      4.2 If true then we update the receiving amount and update the receiving details.
+     * 4.1 If false then we just the set the current array list which created in step 2 as receive details for the specific person
+     * 4.2 If true then we update the receiving amount and update the receiving details.
      *
      * @param data To fetch the mobile number and receiving details.
      */
@@ -157,7 +171,11 @@ public class PersonHelper {
                             BillData.BillPeople billPeople = billData.getBillPeopleList().get(k);
 
                             if (details.getMobileNumber().equals(billPeople.getPeopleNumber())) {
-                                details.setAmount(details.getAmount() + (billData.getBillPaidPeopleList().get(i).getAmount() / billPeopleSize));
+                                if (actionType == ACTION_ADD) {
+                                    details.setAmount(details.getAmount() + (billData.getBillPaidPeopleList().get(i).getAmount() / billPeopleSize));
+                                } else if (actionType == ACTION_DELETE) {
+                                    details.setAmount(details.getAmount() - (billData.getBillPaidPeopleList().get(i).getAmount() / billPeopleSize));
+                                }
                                 details.setName(details.getName());
                             }
                         }
@@ -172,9 +190,9 @@ public class PersonHelper {
         }
     }
 
-    //*********************************************************************//
-    //******************Sort Amount Send Details block********************//
-    //*******************************************************************//
+    //********************************************************************************************//
+    //***************************Sort Amount Send Details block***********************************//
+    //********************************************************************************************//
 
     /**
      * Step:
@@ -182,14 +200,14 @@ public class PersonHelper {
      * 2. Create a array list of person send details data
      * 3. Then we create loop for sendPeople and also another loop for bill paidPeople
      * 4. Then we check person data mobile number is not present in bill paidPeople list
-     *      4.1 If false the he/she will be the one will be receiving the amount
-     *      4.2 Else we create a Send Payment details object for each person
+     * 4.1 If false the he/she will be the one will be receiving the amount
+     * 4.2 Else we create a Send Payment details object for each person
      * 5. Then we check the mobile number of each person in Send Payment details object we created with the bill paid people list
-     *      5.1 If false then we set the previous amount as a sending amount for that person
-     *      5.2 Else we create a loop of bill people list
+     * 5.1 If false then we set the previous amount as a sending amount for that person
+     * 5.2 Else we create a loop of bill people list
      * 6. Then we create a billPeople object for each person in the list then we check that the person data mobile number is included in bill people list
-     *      6.1 If false then we just update the array list created in step 2 with current billPeople object for that person
-     *      6.2 Else we update the amount of the billPeople object person and also update the array list created in step 2
+     * 6.1 If false then we just update the array list created in step 2 with current billPeople object for that person
+     * 6.2 Else we update the amount of the billPeople object person and also update the array list created in step 2
      * 7. Last we update the Send details data and also update payment data
      *
      * @param data To fetch the mobile number and sending details.
@@ -217,7 +235,11 @@ public class PersonHelper {
                                 BillData.BillPeople billPeople = billData.getBillPeopleList().get(k);
 
                                 if (data.getMobileNumber().equals(billPeople.getPeopleNumber())) {
-                                    details.setAmount(details.getAmount() + (billData.getBillPaidPeopleList().get(j).getAmount() / billData.getBillPeopleList().size()));
+                                    if (actionType == ACTION_ADD) {
+                                        details.setAmount(details.getAmount() + (billData.getBillPaidPeopleList().get(j).getAmount() / billData.getBillPeopleList().size()));
+                                    } else if (actionType == ACTION_DELETE) {
+                                        details.setAmount(details.getAmount() - (billData.getBillPaidPeopleList().get(j).getAmount() / billData.getBillPeopleList().size()));
+                                    }
                                 }
                             }
                         } else {
@@ -328,8 +350,8 @@ public class PersonHelper {
      * 2. We create a two loop of receivingPeople and sendingPeople and also create object for each person
      * 3. We check if receivingPeople mobile number is equal to sendingPeople number
      * 4. Then we subtract receivingAmount with sendingAmount and check the final result is greater then zero
-     *      4.1 If true then final result is set as receiving amount and zero is set as sending amount
-     *      4.2 Else vice versa
+     * 4.1 If true then final result is set as receiving amount and zero is set as sending amount
+     * 4.2 Else vice versa
      * 5. Then we update the payment data in personData.
      *
      * @param personData get ReceivingData and sending data to update payment data.

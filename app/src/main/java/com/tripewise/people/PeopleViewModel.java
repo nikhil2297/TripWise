@@ -37,9 +37,9 @@ public class PeopleViewModel extends ViewModel {
         helper.sendToDestination();
     }
 
-    public void updatePersonDetails(Context context, BillData data, List<PersonData> personData){
+    public void updatePersonDetails(Context context, BillData data, List<PersonData> personData, int actionType){
         CommunicationHelper helper = new CommunicationHelper(context);
-        helper.setObject(PersonData.class.getSimpleName(), data, personData);
+        helper.setObject(PersonData.class.getSimpleName(), data, personData, actionType);
         helper.setActionType(CommunicationConstants.TYPE_UPDATE);
         helper.sendToDestination();
     }

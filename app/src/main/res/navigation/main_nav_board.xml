@@ -40,6 +40,9 @@
             app:enterAnim="@anim/fragment_fade_enter"
             app:exitAnim="@anim/fragment_fade_exit"
             app:popUpTo="@+id/billsFragment" />
+        <action
+            android:id="@+id/action_billsFragment_to_editBillFragment"
+            app:destination="@id/editBillFragment" />
     </fragment>
     <fragment
         android:id="@+id/addBillFragment"
@@ -91,4 +94,20 @@
             android:name="trip_data"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/editBillFragment"
+        android:name="com.tripewise.bills.EditBillFragment"
+        android:label="EditBillFragment">
+        <argument
+            android:name="trip_data"
+            app:argType="string" />
+
+        <argument
+            android:name="bill_data"
+            app:argType="string" />
+
+    </fragment>
+    <action
+        android:id="@+id/action_global_billsFragment"
+        app:popUpTo="@id/billsFragment" />
 </navigation>

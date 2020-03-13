@@ -23,9 +23,15 @@ public class BillsAdapter extends RecyclerView.Adapter<BillsAdapter.ItemHolder> 
 
     private List<BillData> billData;
 
-    BillsAdapter(Context context, List<BillData> data) {
-        this.context = context;
-        this.billData = data;
+    private IBillAdapter adapterCallback;
+
+    public static BillsAdapter getInstance(Context context, List<BillData> data, IBillAdapter adapterCallback) {
+        BillsAdapter adapter = new BillsAdapter();
+        adapter.context = context;
+        adapter.billData = data;
+        adapter.adapterCallback = adapterCallback;
+
+        return adapter;
     }
 
     @NonNull
@@ -36,7 +42,7 @@ public class BillsAdapter extends RecyclerView.Adapter<BillsAdapter.ItemHolder> 
 
     @Override
     public void onBindViewHolder(@NonNull ItemHolder holder, int position) {
-        BillData data = billData.get(position);
+        final BillData data = billData.get(position);
 
         holder.tvAmount.setText(context.getResources().getString(R.string.bill_amount, data.getBillAmount()));
         holder.tvBillName.setText(data.getBillName());
@@ -44,6 +50,13 @@ public class BillsAdapter extends RecyclerView.Adapter<BillsAdapter.ItemHolder> 
         for (BillData.BillPeople people : data.getBillPaidPeopleList()) {
             holder.chipBillPayer.addView(createPaidPeopleView(holder.chipBillPayer, people));
         }
+
+        holder.billCardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                adapterCallback.onBillClick(data);
+            }
+        });
     }
 
     /**
@@ -80,6 +93,8 @@ public class BillsAdapter extends RecyclerView.Adapter<BillsAdapter.ItemHolder> 
         TextView tvBillName;
         TextView tvAmount;
 
+        MaterialCardView billCardView;
+
         ChipGroup chipBillPayer;
 
         ItemHolder(@NonNull View itemView) {
@@ -88,7 +103,13 @@ public class BillsAdapter extends RecyclerView.Adapter<BillsAdapter.ItemHolder> 
             tvBillName = itemView.findViewById(R.id.tv_bill_name);
             tvAmount = itemView.findViewById(R.id.tv_bill_amount);
 
+            billCardView = itemView.findViewById(R.id.bill_card);
+
             chipBillPayer = itemView.findViewById(R.id.chip_bill_payer);
         }
+    }
+
+    public interface IBillAdapter{
+        void  onBillClick(BillData billData);
     }
 }

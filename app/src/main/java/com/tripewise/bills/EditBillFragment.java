@@ -33,10 +33,10 @@ import com.tripewise.utilites.storage.data.TripData;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-public class AddBillFragment extends Fragment implements View.OnClickListener {
+public class EditBillFragment extends Fragment implements View.OnClickListener {
     private TripData tripData;
+    private BillData oldBillData;
 
     private CustomEditText etBillName;
     private CustomEditText etBillAmount;
@@ -47,6 +47,7 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     private ChipGroup billPeopleChip;
 
     private ImageView ivBack;
+    private ImageView ivDelete;
 
     private NavController controller;
 
@@ -66,8 +67,9 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        AddBillFragmentArgs args = AddBillFragmentArgs.fromBundle(getArguments());
+        EditBillFragmentArgs args = EditBillFragmentArgs.fromBundle(getArguments());
         tripData = new Gson().fromJson(args.getTripData(), TripData.class);
+        oldBillData = new Gson().fromJson(args.getBillData(), BillData.class);
     }
 
     @Nullable
@@ -91,23 +93,29 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         billPeopleChip = view.findViewById(R.id.chip_bill_people);
 
         ivBack = view.findViewById(R.id.iv_back);
+        ivDelete = view.findViewById(R.id.iv_delete);
 
         init();
     }
 
     private void init() {
         billViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(BillViewModel.class);
-
         peopleViewModel = new ViewModelProvider(this, new ViewModelProvider.NewInstanceFactory()).get(PeopleViewModel.class);
 
-        finalBillPeopleList = new ArrayList<>();
-        finalPaidPeopleList = new ArrayList<>();
+        ivDelete.setVisibility(View.VISIBLE);
+
+        finalBillPeopleList = oldBillData.getBillPeopleList();
+        finalPaidPeopleList = oldBillData.getBillPaidPeopleList();
 
         billPeopleList = new ArrayList<>();
         paidPeopleList = new ArrayList<>();
 
         btCreate.setOnClickListener(this);
         ivBack.setOnClickListener(this);
+        ivDelete.setOnClickListener(this);
+
+        etBillName.setText(oldBillData.getBillName());
+        etBillAmount.setText(String.valueOf(oldBillData.getBillAmount()));
 
         //Add all the travellers in both of the chip group
         addPeople();
@@ -154,11 +162,28 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
                 if (validation()) {
                     BillData billData = createBillData();
 
-                    //Add Bill data to Bill Table
-                    insertBillData(billData);
-                    //Sort the receiving data and sending data of Person Table
-                    insertPersonData(billData);
+                    if (onlyUpdateBill()){
+                        updateBillData(billData);
+
+                        controller.popBackStack();
+                    }else {
+                        if (updateEveryThing()){
+                            updateBillData(billData);
+                          //  updatePersonData(oldBillData, 2);
+                         //   updatePersonData(billData, 1);
+
+                            controller.popBackStack();
+                        }else {
+                            controller.popBackStack();
+                        }
+                    }
                 }
+                break;
+            case R.id.iv_delete:
+                deleteBillData();
+                updatePersonData(oldBillData, 2);
+
+                controller.popBackStack();
                 break;
             case R.id.iv_back:
                 controller.popBackStack();
@@ -166,13 +191,27 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         }
     }
 
-    private void insertBillData(BillData billData) {
-        billViewModel.insertBillData(getActivity(), billData);
+    private boolean onlyUpdateBill(){
+        return  !etBillName.getText().equals(oldBillData.getBillName());
     }
 
-    private void insertPersonData(BillData data) {
-        peopleViewModel.updatePersonDetails(getActivity(), data, personDataList, 1);
-        controller.popBackStack();
+    private boolean updateEveryThing(){
+        boolean isBillPeopleChange = !finalBillPeopleList.equals(oldBillData.getBillPeopleList());
+        boolean isBillPaidPeopleChange = !finalPaidPeopleList.equals(oldBillData.getBillPaidPeopleList());
+
+        return isBillPeopleChange || isBillPaidPeopleChange;
+    }
+
+    private void updatePersonData(BillData data, int type) {
+        peopleViewModel.updatePersonDetails(getActivity(), data, personDataList, type);
+    }
+
+    private void deleteBillData(){
+        billViewModel.deleteBillData(getActivity(), oldBillData);
+    }
+
+    private void updateBillData(BillData billData){
+        billViewModel.updateBillData(getActivity(), billData);
     }
 
     /**
@@ -196,6 +235,12 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         tvName.setTextColor(Color.BLACK);
 
         setUnCheckChip(chipCardView, data);
+
+        for (BillData.BillPeople people : oldBillData.getBillPaidPeopleList()){
+            if (people.getPeopleNumber().equals(data.getMobileNumber())){
+                setAlreadyCheck(chipCardView, people);
+            }
+        }
 
         //Switch type chipView for selected state and unselected state works for the TextView too
         layoutChip.setOnClickListener(new View.OnClickListener() {
@@ -241,7 +286,13 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         tvFullName.setVisibility(View.VISIBLE);
         tvName.setText(data.getPersonName().substring(0, 2).toUpperCase());
 
-        setCheckedChip(chipCardView, data);
+        setUnCheckChip(chipCardView, data);
+
+        for (BillData.BillPeople people : oldBillData.getBillPeopleList()){
+            if (people.getPeopleNumber().equals(data.getMobileNumber())){
+                setAlreadyCheck(chipCardView, people);
+            }
+        }
 
         //Switch type chipView for selected state and unselected state works for the TextView too
         layoutChip.setOnClickListener(new View.OnClickListener() {
@@ -382,6 +433,18 @@ public class AddBillFragment extends Fragment implements View.OnClickListener {
         unCheckChip.setCardBackgroundColor(Color.WHITE);
         unCheckChip.setStrokeWidth(1);
         unCheckChip.setStrokeColor(Color.BLACK);
+    }
+
+    private void setAlreadyCheck(MaterialCardView checkedChip, BillData.BillPeople people){
+        checkedChip.setCardBackgroundColor(people.getPeopleColor());
+        checkedChip.setStrokeWidth(0);
+        checkedChip.setStrokeColor(Color.TRANSPARENT);
+    }
+
+    private void setAlreadyUnCheck(MaterialCardView unCheckedChip, BillData.BillPeople people){
+        unCheckedChip.setCardBackgroundColor(Color.WHITE);
+        unCheckedChip.setStrokeWidth(1);
+        unCheckedChip.setStrokeColor(Color.BLACK);
     }
 
     //We create a BillData that with bill Name, Amount, Trip id, paidPeople list, bill people list.

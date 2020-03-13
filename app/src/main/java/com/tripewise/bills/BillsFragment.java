@@ -100,7 +100,15 @@ public class BillsFragment extends Fragment implements View.OnClickListener {
             @Override
             public void onChanged(List<BillData> billData) {
                 if (billData != null) {
-                    BillsAdapter adapter = new BillsAdapter(getActivity(), billData);
+                    BillsAdapter adapter = BillsAdapter.getInstance(getActivity(), billData, new BillsAdapter.IBillAdapter() {
+                        @Override
+                        public void onBillClick(BillData billData) {
+                            BillsFragmentDirections.ActionBillsFragmentToEditBillFragment directions =
+                                    BillsFragmentDirections.actionBillsFragmentToEditBillFragment(new Gson().toJson(tripData), new Gson().toJson(billData));
+
+                            controller.navigate(directions);
+                        }
+                    });
 
                     rvBills.setAdapter(adapter);
                 }
