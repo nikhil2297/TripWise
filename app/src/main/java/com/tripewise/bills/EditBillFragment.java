@@ -450,6 +450,7 @@ public class EditBillFragment extends Fragment implements View.OnClickListener {
     //We create a BillData that with bill Name, Amount, Trip id, paidPeople list, bill people list.
     private BillData createBillData() {
         BillData data = new BillData();
+        data.setId(oldBillData.getId());
         data.setBillName(etBillName.getText().toString());
         data.setBillAmount(Long.parseLong(etBillAmount.getText().toString()));
         data.setTripId(tripData.getId());
