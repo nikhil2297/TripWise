@@ -53,13 +53,13 @@ public class PersonHelper {
             calculatePaymentDetails(data);
         }
 
-/*        for (PersonData data : personData) {
+        for (PersonData data : personData) {
             getTotalPayingAmount(data);
 
             getTotalReceivingAmount(data);
 
             getTotalPaidAmount(data);
-        }*/
+        }
 
         return personData;
     }
